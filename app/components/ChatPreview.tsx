@@ -2,7 +2,8 @@ import { useEffect, useReducer, useRef, useState } from "react";
 
 const AI_AVATAR_URL =
   "https://api.dicebear.com/7.x/bottts/svg?seed=site-sensei&backgroundColor=633CFF";
-const USER_AVATAR_URL = "https://api.dicebear.com/7.x/avataaars/svg?seed=user";
+const USER_AVATAR_URL =
+  "https://api.dicebear.com/7.x/avataaars/svg?seed=qwesdfx&backgroundColor=FFA500";
 
 type Message = {
   role: "user" | "ai";
@@ -222,7 +223,8 @@ export function ChatPreview() {
   });
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const lastUpdateTime = useRef<number>(Date.now());
+  const userTypingIndex = useRef<number>(0);
 
   const { displayedText, isComplete } = useTypewriter(
     state.currentTypingText,
@@ -237,75 +239,79 @@ export function ChatPreview() {
     }
   }, [state.messages, displayedText]);
 
-  // State machine effect
+  // Single interval state machine
   useEffect(() => {
-    if (state.conversationIndex >= DEMO_CONVERSATIONS.length) {
-      // Reset to initial state after completing all conversations
-      dispatch({
-        type: "SET_TYPING_TEXT",
-        text: WELCOME_MESSAGE,
-      });
-      return;
-    }
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const timePassed = now - lastUpdateTime.current;
 
-    const conversation = DEMO_CONVERSATIONS[state.conversationIndex];
-
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    switch (state.phase) {
-      case "ai_typing":
-        // Start AI typing if no current text
-        if (!state.currentTypingText) {
-          dispatch({
-            type: "SET_TYPING_TEXT",
-            text:
-              state.conversationIndex === 0 ? WELCOME_MESSAGE : conversation.ai,
-          });
-        }
-        // When typing is complete, wait then move to user typing
-        else if (isComplete) {
-          timeoutRef.current = setTimeout(() => {
-            dispatch({ type: "COMPLETE_AI_TYPING" });
-            // Move to next conversation after AI message is complete
-            dispatch({ type: "START_USER_TYPING" });
-          }, 1000);
-        }
-        break;
-
-      case "user_typing":
-        // Start user typing simulation
-        const simulateUserTyping = async () => {
-          let typingText = "";
-          for (let i = 0; i < conversation.user.length; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 25));
-            typingText += conversation.user[i];
-            dispatch({ type: "SET_INPUT_TEXT", text: typingText });
-          }
-          // After typing complete, wait then submit
-          timeoutRef.current = setTimeout(() => {
-            dispatch({ type: "SUBMIT_USER_MESSAGE", text: conversation.user });
-          }, 1000);
-        };
-        simulateUserTyping();
-        break;
-
-      case "ai_thinking":
-        // Show thinking animation, then start AI response
-        timeoutRef.current = setTimeout(() => {
-          dispatch({ type: "START_AI_RESPONSE" });
-        }, 1000);
-        break;
-    }
-
-    // Cleanup timeout on unmount or phase change
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (state.conversationIndex >= DEMO_CONVERSATIONS.length) {
+        dispatch({
+          type: "SET_TYPING_TEXT",
+          text: WELCOME_MESSAGE,
+        });
+        return;
       }
-    };
+
+      const conversation = DEMO_CONVERSATIONS[state.conversationIndex];
+
+      switch (state.phase) {
+        case "ai_typing":
+          if (!state.currentTypingText) {
+            // Set the text immediately when entering typing state
+            const text =
+              state.conversationIndex === 0 ? WELCOME_MESSAGE : conversation.ai;
+            dispatch({
+              type: "SET_TYPING_TEXT",
+              text,
+            });
+            lastUpdateTime.current = now;
+          } else if (isComplete && timePassed >= 1000) {
+            dispatch({ type: "COMPLETE_AI_TYPING" });
+            dispatch({ type: "START_USER_TYPING" });
+            lastUpdateTime.current = now;
+            userTypingIndex.current = 0;
+          }
+          break;
+
+        case "user_typing":
+          if (
+            userTypingIndex.current < conversation.user.length &&
+            timePassed >= 25
+          ) {
+            const typingText = conversation.user.slice(
+              0,
+              userTypingIndex.current + 1
+            );
+            dispatch({ type: "SET_INPUT_TEXT", text: typingText });
+            userTypingIndex.current++;
+            lastUpdateTime.current = now;
+          } else if (
+            userTypingIndex.current >= conversation.user.length &&
+            timePassed >= 1000
+          ) {
+            dispatch({ type: "SUBMIT_USER_MESSAGE", text: conversation.user });
+            lastUpdateTime.current = now;
+          }
+          break;
+
+        case "ai_thinking":
+          if (timePassed >= 500) {
+            // Pre-set the text before transitioning to typing state
+            const text =
+              state.conversationIndex === 0 ? WELCOME_MESSAGE : conversation.ai;
+            dispatch({
+              type: "SET_TYPING_TEXT",
+              text,
+            });
+            dispatch({ type: "START_AI_RESPONSE" });
+            lastUpdateTime.current = now;
+          }
+          break;
+      }
+    }, 25);
+
+    return () => clearInterval(interval);
   }, [
     state.phase,
     state.conversationIndex,
@@ -358,37 +364,28 @@ export function ChatPreview() {
           </div>
         ))}
 
-        {state.phase === "ai_typing" && state.currentTypingText && (
+        {(state.phase === "ai_thinking" || state.phase === "ai_typing") && (
           <div className="flex items-end gap-4 flex-row-reverse">
             <div className="flex-1 bg-gray-100 text-gray-900 rounded-lg p-3 text-sm">
-              {displayedText}
-            </div>
-            <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-              <img
-                src={AI_AVATAR_URL}
-                alt="AI Avatar"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {state.phase === "ai_thinking" && (
-          <div className="flex items-end gap-4 flex-row-reverse">
-            <div className="flex-1 bg-gray-100 text-gray-900 rounded-lg p-3 text-sm">
-              <div className="flex items-center space-x-2">
-                <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0ms" }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "150ms" }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "300ms" }}
-                ></div>
+              <div className="min-h-[24px]">
+                {state.phase === "ai_thinking" ? (
+                  <div className="flex items-center space-x-2">
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    ></div>
+                  </div>
+                ) : (
+                  displayedText
+                )}
               </div>
             </div>
             <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
@@ -405,15 +402,17 @@ export function ChatPreview() {
       <div className="relative">
         <input
           type="text"
-          className="w-full rounded-full border-gray-200 pl-4 pr-10 py-2 text-sm"
+          className="w-full rounded-full border-2 border-gray-200 pl-4 pr-10 py-2 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-20"
           placeholder="Type your message..."
           value={state.inputText}
           disabled
         />
         <button
           className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 ${
-            state.inputText ? "bg-indigo-600" : "bg-gray-300"
-          } text-white transition-colors`}
+            state.inputText
+              ? "bg-indigo-600 hover:bg-indigo-700"
+              : "bg-gray-400"
+          } text-white transition-colors shadow-sm`}
         >
           <svg
             className="h-4 w-4"

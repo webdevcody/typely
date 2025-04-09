@@ -81,9 +81,6 @@ export function Testimonials() {
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-indigo-600">
             Testimonials
           </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Trusted by companies worldwide
-          </p>
         </div>
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
           {testimonials.map((testimonial) => (
@@ -115,23 +112,7 @@ export function Testimonials() {
           >
             <div className="w-full border-t border-gray-200" />
           </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white px-3 text-base font-semibold leading-6 text-gray-900">
-              Trusted by
-            </span>
-          </div>
-        </div>
-        <div className="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-5 sm:gap-x-10 lg:mx-0 lg:max-w-none">
-          {logos.map((company) => (
-            <img
-              key={company.name}
-              className="col-span-2 max-h-12 w-full object-contain lg:col-span-1 grayscale hover:grayscale-0 transition-all"
-              src={company.logo}
-              alt={company.name}
-              width={158}
-              height={48}
-            />
-          ))}
+          <div className="relative flex justify-center"></div>
         </div>
       </div>
     </div>

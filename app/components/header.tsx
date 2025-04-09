@@ -23,7 +23,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Dashboard", href: "/dashboard" },
-  { name: "About", href: "/about" },
+  { name: "Change Log", href: "/changelog" },
 ];
 
 export function Header() {
