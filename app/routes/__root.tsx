@@ -11,6 +11,7 @@ import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import appCss from "@/styles/app.css?url";
 import { ConvexReactClient } from "convex/react";
 import { Header } from "@/components/header";
+import { Footer } from "@/components/Footer";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 
 export const Route = createRootRouteWithContext<{
@@ -26,7 +27,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Site Sensei - AI Chat Agents for Your Website",
       },
     ],
     links: [
@@ -43,8 +44,13 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <Header />
-      <Outlet />
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </RootDocument>
   );
 }
