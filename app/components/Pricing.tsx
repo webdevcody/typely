@@ -60,14 +60,14 @@ export function Pricing() {
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">
+          <h2 className="text-base font-semibold leading-7 text-primary">
             Pricing
           </h2>
-          <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+          <p className="mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Choose the perfect plan for your site
           </p>
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
+        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-muted-foreground">
           Start empowering your website with AI-powered chat agents. Scale as
           you grow.
         </p>
@@ -78,14 +78,14 @@ export function Pricing() {
               key={tier.id}
               className={`rounded-3xl p-8 ring-1 xl:p-10 ${
                 tier.featured
-                  ? "bg-gray-900 ring-gray-900"
-                  : "ring-gray-200 bg-white"
+                  ? "bg-primary-foreground ring-primary"
+                  : "ring-border bg-card"
               }`}
             >
               <div className="flex items-center justify-between gap-x-4">
                 <h3
                   className={`text-lg font-semibold leading-8 ${
-                    tier.featured ? "text-white" : "text-gray-900"
+                    tier.featured ? "text-primary" : "text-foreground"
                   }`}
                 >
                   {tier.name}
@@ -93,7 +93,7 @@ export function Pricing() {
               </div>
               <p
                 className={`mt-4 text-sm leading-6 ${
-                  tier.featured ? "text-gray-300" : "text-gray-600"
+                  tier.featured ? "text-primary/90" : "text-muted-foreground"
                 }`}
               >
                 {tier.description}
@@ -101,14 +101,14 @@ export function Pricing() {
               <p className="mt-6 flex items-baseline gap-x-1">
                 <span
                   className={`text-4xl font-bold tracking-tight ${
-                    tier.featured ? "text-white" : "text-gray-900"
+                    tier.featured ? "text-primary" : "text-foreground"
                   }`}
                 >
                   {tier.priceMonthly}
                 </span>
                 <span
                   className={`text-sm font-semibold leading-6 ${
-                    tier.featured ? "text-gray-300" : "text-gray-600"
+                    tier.featured ? "text-primary/90" : "text-muted-foreground"
                   }`}
                 >
                   /month
@@ -117,23 +117,25 @@ export function Pricing() {
               <Button
                 className={`mt-6 w-full ${
                   tier.featured
-                    ? "bg-white text-gray-900 hover:bg-gray-100"
-                    : "bg-indigo-600 text-white hover:bg-indigo-500"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90"
                 }`}
               >
                 Get started
               </Button>
               <ul
+                role="list"
                 className={`mt-8 space-y-3 text-sm leading-6 ${
-                  tier.featured ? "text-gray-300" : "text-gray-600"
+                  tier.featured ? "text-primary/90" : "text-muted-foreground"
                 }`}
               >
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex gap-x-3">
                     <Check
                       className={`h-6 w-5 flex-none ${
-                        tier.featured ? "text-white" : "text-indigo-600"
+                        tier.featured ? "text-primary" : "text-primary"
                       }`}
+                      aria-hidden="true"
                     />
                     {feature}
                   </li>

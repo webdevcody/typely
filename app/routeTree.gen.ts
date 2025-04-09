@@ -11,10 +11,28 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SettingsImport } from './routes/settings'
 import { Route as ChangelogImport } from './routes/changelog'
 import { Route as IndexImport } from './routes/index'
+import { Route as OnboardingIndexImport } from './routes/onboarding/index'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as OnboardingStepImport } from './routes/onboarding/$step'
+import { Route as DashboardSiteIdRouteImport } from './routes/dashboard/$siteId/route'
+import { Route as DashboardSiteIdIndexImport } from './routes/dashboard/$siteId/index'
+import { Route as DashboardSiteIdSettingsImport } from './routes/dashboard/$siteId/settings'
+import { Route as DashboardSiteIdDocumentsImport } from './routes/dashboard/$siteId/documents'
+import { Route as DashboardSiteIdChatsImport } from './routes/dashboard/$siteId/chats'
+import { Route as DashboardSiteIdAgentsImport } from './routes/dashboard/$siteId/agents'
+import { Route as DashboardSiteIdPagesIndexImport } from './routes/dashboard/$siteId/pages/index'
+import { Route as DashboardSiteIdPagesPageIdImport } from './routes/dashboard/$siteId/pages/$pageId'
 
 // Create/Update Routes
+
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ChangelogRoute = ChangelogImport.update({
   id: '/changelog',
@@ -27,6 +45,74 @@ const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const OnboardingIndexRoute = OnboardingIndexImport.update({
+  id: '/onboarding/',
+  path: '/onboarding/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OnboardingStepRoute = OnboardingStepImport.update({
+  id: '/onboarding/$step',
+  path: '/onboarding/$step',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardSiteIdRouteRoute = DashboardSiteIdRouteImport.update({
+  id: '/dashboard/$siteId',
+  path: '/dashboard/$siteId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardSiteIdIndexRoute = DashboardSiteIdIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdSettingsRoute = DashboardSiteIdSettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdDocumentsRoute = DashboardSiteIdDocumentsImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdChatsRoute = DashboardSiteIdChatsImport.update({
+  id: '/chats',
+  path: '/chats',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdAgentsRoute = DashboardSiteIdAgentsImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdPagesIndexRoute = DashboardSiteIdPagesIndexImport.update({
+  id: '/pages/',
+  path: '/pages/',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdPagesPageIdRoute = DashboardSiteIdPagesPageIdImport.update(
+  {
+    id: '/pages/$pageId',
+    path: '/pages/$pageId',
+    getParentRoute: () => DashboardSiteIdRouteRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -46,44 +132,238 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChangelogImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/$siteId': {
+      id: '/dashboard/$siteId'
+      path: '/dashboard/$siteId'
+      fullPath: '/dashboard/$siteId'
+      preLoaderRoute: typeof DashboardSiteIdRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/onboarding/$step': {
+      id: '/onboarding/$step'
+      path: '/onboarding/$step'
+      fullPath: '/onboarding/$step'
+      preLoaderRoute: typeof OnboardingStepImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/$siteId/agents': {
+      id: '/dashboard/$siteId/agents'
+      path: '/agents'
+      fullPath: '/dashboard/$siteId/agents'
+      preLoaderRoute: typeof DashboardSiteIdAgentsImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/chats': {
+      id: '/dashboard/$siteId/chats'
+      path: '/chats'
+      fullPath: '/dashboard/$siteId/chats'
+      preLoaderRoute: typeof DashboardSiteIdChatsImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/documents': {
+      id: '/dashboard/$siteId/documents'
+      path: '/documents'
+      fullPath: '/dashboard/$siteId/documents'
+      preLoaderRoute: typeof DashboardSiteIdDocumentsImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/settings': {
+      id: '/dashboard/$siteId/settings'
+      path: '/settings'
+      fullPath: '/dashboard/$siteId/settings'
+      preLoaderRoute: typeof DashboardSiteIdSettingsImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/': {
+      id: '/dashboard/$siteId/'
+      path: '/'
+      fullPath: '/dashboard/$siteId/'
+      preLoaderRoute: typeof DashboardSiteIdIndexImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/pages/$pageId': {
+      id: '/dashboard/$siteId/pages/$pageId'
+      path: '/pages/$pageId'
+      fullPath: '/dashboard/$siteId/pages/$pageId'
+      preLoaderRoute: typeof DashboardSiteIdPagesPageIdImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/pages/': {
+      id: '/dashboard/$siteId/pages/'
+      path: '/pages'
+      fullPath: '/dashboard/$siteId/pages'
+      preLoaderRoute: typeof DashboardSiteIdPagesIndexImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface DashboardSiteIdRouteRouteChildren {
+  DashboardSiteIdAgentsRoute: typeof DashboardSiteIdAgentsRoute
+  DashboardSiteIdChatsRoute: typeof DashboardSiteIdChatsRoute
+  DashboardSiteIdDocumentsRoute: typeof DashboardSiteIdDocumentsRoute
+  DashboardSiteIdSettingsRoute: typeof DashboardSiteIdSettingsRoute
+  DashboardSiteIdIndexRoute: typeof DashboardSiteIdIndexRoute
+  DashboardSiteIdPagesPageIdRoute: typeof DashboardSiteIdPagesPageIdRoute
+  DashboardSiteIdPagesIndexRoute: typeof DashboardSiteIdPagesIndexRoute
+}
+
+const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
+  DashboardSiteIdAgentsRoute: DashboardSiteIdAgentsRoute,
+  DashboardSiteIdChatsRoute: DashboardSiteIdChatsRoute,
+  DashboardSiteIdDocumentsRoute: DashboardSiteIdDocumentsRoute,
+  DashboardSiteIdSettingsRoute: DashboardSiteIdSettingsRoute,
+  DashboardSiteIdIndexRoute: DashboardSiteIdIndexRoute,
+  DashboardSiteIdPagesPageIdRoute: DashboardSiteIdPagesPageIdRoute,
+  DashboardSiteIdPagesIndexRoute: DashboardSiteIdPagesIndexRoute,
+}
+
+const DashboardSiteIdRouteRouteWithChildren =
+  DashboardSiteIdRouteRoute._addFileChildren(DashboardSiteIdRouteRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/settings': typeof SettingsRoute
+  '/dashboard/$siteId': typeof DashboardSiteIdRouteRouteWithChildren
+  '/onboarding/$step': typeof OnboardingStepRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/onboarding': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
+  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
+  '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
+  '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
+  '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/settings': typeof SettingsRoute
+  '/onboarding/$step': typeof OnboardingStepRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/onboarding': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
+  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
+  '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
+  '/dashboard/$siteId': typeof DashboardSiteIdIndexRoute
+  '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
+  '/settings': typeof SettingsRoute
+  '/dashboard/$siteId': typeof DashboardSiteIdRouteRouteWithChildren
+  '/onboarding/$step': typeof OnboardingStepRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/onboarding/': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
+  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
+  '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
+  '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
+  '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/pages/': typeof DashboardSiteIdPagesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/changelog'
+  fullPaths:
+    | '/'
+    | '/changelog'
+    | '/settings'
+    | '/dashboard/$siteId'
+    | '/onboarding/$step'
+    | '/dashboard'
+    | '/onboarding'
+    | '/dashboard/$siteId/agents'
+    | '/dashboard/$siteId/chats'
+    | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/settings'
+    | '/dashboard/$siteId/'
+    | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/pages'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/changelog'
-  id: '__root__' | '/' | '/changelog'
+  to:
+    | '/'
+    | '/changelog'
+    | '/settings'
+    | '/onboarding/$step'
+    | '/dashboard'
+    | '/onboarding'
+    | '/dashboard/$siteId/agents'
+    | '/dashboard/$siteId/chats'
+    | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/settings'
+    | '/dashboard/$siteId'
+    | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/pages'
+  id:
+    | '__root__'
+    | '/'
+    | '/changelog'
+    | '/settings'
+    | '/dashboard/$siteId'
+    | '/onboarding/$step'
+    | '/dashboard/'
+    | '/onboarding/'
+    | '/dashboard/$siteId/agents'
+    | '/dashboard/$siteId/chats'
+    | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/settings'
+    | '/dashboard/$siteId/'
+    | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/pages/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChangelogRoute: typeof ChangelogRoute
+  SettingsRoute: typeof SettingsRoute
+  DashboardSiteIdRouteRoute: typeof DashboardSiteIdRouteRouteWithChildren
+  OnboardingStepRoute: typeof OnboardingStepRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChangelogRoute: ChangelogRoute,
+  SettingsRoute: SettingsRoute,
+  DashboardSiteIdRouteRoute: DashboardSiteIdRouteRouteWithChildren,
+  OnboardingStepRoute: OnboardingStepRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +377,12 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/changelog"
+        "/changelog",
+        "/settings",
+        "/dashboard/$siteId",
+        "/onboarding/$step",
+        "/dashboard/",
+        "/onboarding/"
       ]
     },
     "/": {
@@ -105,6 +390,58 @@ export const routeTree = rootRoute
     },
     "/changelog": {
       "filePath": "changelog.tsx"
+    },
+    "/settings": {
+      "filePath": "settings.tsx"
+    },
+    "/dashboard/$siteId": {
+      "filePath": "dashboard/$siteId/route.tsx",
+      "children": [
+        "/dashboard/$siteId/agents",
+        "/dashboard/$siteId/chats",
+        "/dashboard/$siteId/documents",
+        "/dashboard/$siteId/settings",
+        "/dashboard/$siteId/",
+        "/dashboard/$siteId/pages/$pageId",
+        "/dashboard/$siteId/pages/"
+      ]
+    },
+    "/onboarding/$step": {
+      "filePath": "onboarding/$step.tsx"
+    },
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx"
+    },
+    "/onboarding/": {
+      "filePath": "onboarding/index.tsx"
+    },
+    "/dashboard/$siteId/agents": {
+      "filePath": "dashboard/$siteId/agents.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/chats": {
+      "filePath": "dashboard/$siteId/chats.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/documents": {
+      "filePath": "dashboard/$siteId/documents.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/settings": {
+      "filePath": "dashboard/$siteId/settings.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/": {
+      "filePath": "dashboard/$siteId/index.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/pages/$pageId": {
+      "filePath": "dashboard/$siteId/pages/$pageId.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/pages/": {
+      "filePath": "dashboard/$siteId/pages/index.tsx",
+      "parent": "/dashboard/$siteId"
     }
   }
 }

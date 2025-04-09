@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="bg-white">
+    <footer className="bg-background">
       <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
         <div className="flex justify-center space-x-6 md:order-2">
           <a href="#" className="text-gray-400 hover:text-gray-500">
@@ -34,30 +34,30 @@ export function Footer() {
           <nav className="flex justify-center space-x-6 md:order-2 mb-6">
             <a
               href="#"
-              className="text-sm leading-6 text-gray-600 hover:text-gray-900"
+              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
             >
               About
             </a>
             <a
               href="#"
-              className="text-sm leading-6 text-gray-600 hover:text-gray-900"
+              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
             >
               Features
             </a>
             <a
               href="#"
-              className="text-sm leading-6 text-gray-600 hover:text-gray-900"
+              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
             >
               Pricing
             </a>
             <a
               href="#"
-              className="text-sm leading-6 text-gray-600 hover:text-gray-900"
+              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
             >
               Contact
             </a>
           </nav>
-          <p className="text-center text-xs leading-5 text-gray-500">
+          <p className="text-center text-xs leading-5 text-muted-foreground">
             &copy; {new Date().getFullYear()} Site Sensei. All rights reserved.
           </p>
         </div>

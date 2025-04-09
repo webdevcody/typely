@@ -330,7 +330,7 @@ export function ChatPreview() {
           />
         </div>
         <div className="text-sm font-medium text-gray-900">
-          Chatting with Site Sensei
+          Chatting with an AI assistant
         </div>
       </div>
 

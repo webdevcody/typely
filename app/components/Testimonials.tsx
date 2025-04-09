@@ -56,8 +56,8 @@ const logos = [
 
 export function Testimonials() {
   return (
-    <div className="relative isolate bg-white pb-32 pt-24 sm:pt-32">
-      <div className="absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 transform-gpu overflow-hidden opacity-30 blur-3xl">
+    <div className="relative isolate bg-background pb-32 pt-24 sm:pt-32">
+      <div className="absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 transform-gpu overflow-hidden opacity-20 dark:opacity-10">
         <div
           className="ml-[max(50%,38rem)] aspect-[1313/771] w-[82.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc]"
           style={{
@@ -68,7 +68,7 @@ export function Testimonials() {
       </div>
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 dark:opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style={{
             clipPath:
               "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
@@ -78,28 +78,30 @@ export function Testimonials() {
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <h2 className="text-lg font-semibold leading-8 tracking-tight text-indigo-600">
+          <h2 className="text-lg font-semibold leading-8 tracking-tight text-primary">
             Testimonials
           </h2>
         </div>
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-foreground sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.author.name}
-              className="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 p-6"
+              className="rounded-2xl bg-card shadow-lg ring-1 ring-border p-6"
             >
-              <blockquote className="text-gray-900">
+              <blockquote className="text-foreground">
                 <p>{`"${testimonial.body}"`}</p>
               </blockquote>
               <figcaption className="mt-6 flex items-center gap-x-4">
                 <img
-                  className="h-10 w-10 rounded-full bg-gray-50"
+                  className="h-10 w-10 rounded-full bg-muted"
                   src={testimonial.author.image}
                   alt=""
                 />
                 <div>
-                  <div className="font-semibold">{testimonial.author.name}</div>
-                  <div className="text-gray-600">{`${testimonial.author.role}, ${testimonial.author.company}`}</div>
+                  <div className="font-semibold text-foreground">
+                    {testimonial.author.name}
+                  </div>
+                  <div className="text-muted-foreground">{`${testimonial.author.role}, ${testimonial.author.company}`}</div>
                 </div>
               </figcaption>
             </figure>
@@ -110,7 +112,7 @@ export function Testimonials() {
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="w-full border-t border-gray-200" />
+            <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center"></div>
         </div>
