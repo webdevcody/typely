@@ -1,6 +1,63 @@
 import { v } from "convex/values";
-import { internalMutation, internalQuery } from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
+import { internalMutation, internalQuery, query } from "./_generated/server";
+import { isSiteAdmin } from "./authorization";
+
+export const getMessages = query({
+  args: {
+    chatSessionId: v.id("chatSessions"),
+  },
+  handler: async (ctx, args) => {
+    const chatSession = await ctx.db.get(args.chatSessionId);
+    if (!chatSession) {
+      return [];
+    }
+
+    const site = await isSiteAdmin(ctx, chatSession.siteId);
+    if (!site) {
+      return [];
+    }
+
+    return await ctx.db
+      .query("chatMessages")
+      .filter((q) => q.eq(q.field("chatSessionId"), args.chatSessionId))
+      .collect();
+  },
+});
+export const listSessions = query({
+  args: {
+    siteId: v.id("sites"),
+  },
+  handler: async (ctx, args) => {
+    const site = await isSiteAdmin(ctx, args.siteId);
+    if (!site) {
+      return [];
+    }
+    const sessions = await ctx.db
+      .query("chatSessions")
+      .withIndex("by_siteId", (q) => q.eq("siteId", args.siteId))
+      .order("desc")
+      .take(20);
+
+    return await Promise.all(
+      sessions.map(async (session) => ({
+        ...session,
+        firstMessage: await ctx.db
+          .query("chatMessages")
+          .withIndex("by_chatSessionId", (q) =>
+            q.eq("chatSessionId", session._id)
+          )
+          .first(),
+        lastMessage: await ctx.db
+          .query("chatMessages")
+          .withIndex("by_chatSessionId", (q) =>
+            q.eq("chatSessionId", session._id)
+          )
+          .order("desc")
+          .first(),
+      }))
+    );
+  },
+});
 
 export const createChatMessage = internalMutation({
   args: {
@@ -41,19 +98,19 @@ export const listMessages = internalQuery({
     createdAfter: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db
+    let queryBuilder = ctx.db
       .query("chatMessages")
       .withIndex("by_chatSessionId", (q) =>
         q.eq("chatSessionId", args.chatSessionId)
       );
 
     if (args.createdAfter !== undefined) {
-      query = query.filter((q) =>
+      queryBuilder = queryBuilder.filter((q) =>
         q.gt(q.field("createdAt"), args.createdAfter!)
       );
     }
 
-    return await query.order("asc").collect();
+    return await queryBuilder.order("asc").collect();
   },
 });
 

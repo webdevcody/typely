@@ -21,9 +21,9 @@ import { Route as DashboardSiteIdRouteImport } from './routes/dashboard/$siteId/
 import { Route as DashboardSiteIdIndexImport } from './routes/dashboard/$siteId/index'
 import { Route as DashboardSiteIdSettingsImport } from './routes/dashboard/$siteId/settings'
 import { Route as DashboardSiteIdDocumentsImport } from './routes/dashboard/$siteId/documents'
-import { Route as DashboardSiteIdChatsImport } from './routes/dashboard/$siteId/chats'
 import { Route as DashboardSiteIdAgentsImport } from './routes/dashboard/$siteId/agents'
 import { Route as DashboardSiteIdPagesIndexImport } from './routes/dashboard/$siteId/pages/index'
+import { Route as DashboardSiteIdChatsIndexImport } from './routes/dashboard/$siteId/chats/index'
 import { Route as DashboardSiteIdPagesPageIdImport } from './routes/dashboard/$siteId/pages/$pageId'
 
 // Create/Update Routes
@@ -88,12 +88,6 @@ const DashboardSiteIdDocumentsRoute = DashboardSiteIdDocumentsImport.update({
   getParentRoute: () => DashboardSiteIdRouteRoute,
 } as any)
 
-const DashboardSiteIdChatsRoute = DashboardSiteIdChatsImport.update({
-  id: '/chats',
-  path: '/chats',
-  getParentRoute: () => DashboardSiteIdRouteRoute,
-} as any)
-
 const DashboardSiteIdAgentsRoute = DashboardSiteIdAgentsImport.update({
   id: '/agents',
   path: '/agents',
@@ -103,6 +97,12 @@ const DashboardSiteIdAgentsRoute = DashboardSiteIdAgentsImport.update({
 const DashboardSiteIdPagesIndexRoute = DashboardSiteIdPagesIndexImport.update({
   id: '/pages/',
   path: '/pages/',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
+const DashboardSiteIdChatsIndexRoute = DashboardSiteIdChatsIndexImport.update({
+  id: '/chats/',
+  path: '/chats/',
   getParentRoute: () => DashboardSiteIdRouteRoute,
 } as any)
 
@@ -174,13 +174,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSiteIdAgentsImport
       parentRoute: typeof DashboardSiteIdRouteImport
     }
-    '/dashboard/$siteId/chats': {
-      id: '/dashboard/$siteId/chats'
-      path: '/chats'
-      fullPath: '/dashboard/$siteId/chats'
-      preLoaderRoute: typeof DashboardSiteIdChatsImport
-      parentRoute: typeof DashboardSiteIdRouteImport
-    }
     '/dashboard/$siteId/documents': {
       id: '/dashboard/$siteId/documents'
       path: '/documents'
@@ -209,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSiteIdPagesPageIdImport
       parentRoute: typeof DashboardSiteIdRouteImport
     }
+    '/dashboard/$siteId/chats/': {
+      id: '/dashboard/$siteId/chats/'
+      path: '/chats'
+      fullPath: '/dashboard/$siteId/chats'
+      preLoaderRoute: typeof DashboardSiteIdChatsIndexImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
     '/dashboard/$siteId/pages/': {
       id: '/dashboard/$siteId/pages/'
       path: '/pages'
@@ -223,21 +223,21 @@ declare module '@tanstack/react-router' {
 
 interface DashboardSiteIdRouteRouteChildren {
   DashboardSiteIdAgentsRoute: typeof DashboardSiteIdAgentsRoute
-  DashboardSiteIdChatsRoute: typeof DashboardSiteIdChatsRoute
   DashboardSiteIdDocumentsRoute: typeof DashboardSiteIdDocumentsRoute
   DashboardSiteIdSettingsRoute: typeof DashboardSiteIdSettingsRoute
   DashboardSiteIdIndexRoute: typeof DashboardSiteIdIndexRoute
   DashboardSiteIdPagesPageIdRoute: typeof DashboardSiteIdPagesPageIdRoute
+  DashboardSiteIdChatsIndexRoute: typeof DashboardSiteIdChatsIndexRoute
   DashboardSiteIdPagesIndexRoute: typeof DashboardSiteIdPagesIndexRoute
 }
 
 const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
   DashboardSiteIdAgentsRoute: DashboardSiteIdAgentsRoute,
-  DashboardSiteIdChatsRoute: DashboardSiteIdChatsRoute,
   DashboardSiteIdDocumentsRoute: DashboardSiteIdDocumentsRoute,
   DashboardSiteIdSettingsRoute: DashboardSiteIdSettingsRoute,
   DashboardSiteIdIndexRoute: DashboardSiteIdIndexRoute,
   DashboardSiteIdPagesPageIdRoute: DashboardSiteIdPagesPageIdRoute,
+  DashboardSiteIdChatsIndexRoute: DashboardSiteIdChatsIndexRoute,
   DashboardSiteIdPagesIndexRoute: DashboardSiteIdPagesIndexRoute,
 }
 
@@ -253,11 +253,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
-  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
 }
 
@@ -269,11 +269,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
-  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
 }
 
@@ -287,11 +287,11 @@ export interface FileRoutesById {
   '/dashboard/': typeof DashboardIndexRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
-  '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
+  '/dashboard/$siteId/chats/': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/pages/': typeof DashboardSiteIdPagesIndexRoute
 }
 
@@ -306,11 +306,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/dashboard/$siteId/agents'
-    | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/documents'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/pages'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -321,11 +321,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/dashboard/$siteId/agents'
-    | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/documents'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId'
     | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/pages'
   id:
     | '__root__'
@@ -337,11 +337,11 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/onboarding/'
     | '/dashboard/$siteId/agents'
-    | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/documents'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/pages/$pageId'
+    | '/dashboard/$siteId/chats/'
     | '/dashboard/$siteId/pages/'
   fileRoutesById: FileRoutesById
 }
@@ -398,11 +398,11 @@ export const routeTree = rootRoute
       "filePath": "dashboard/$siteId/route.tsx",
       "children": [
         "/dashboard/$siteId/agents",
-        "/dashboard/$siteId/chats",
         "/dashboard/$siteId/documents",
         "/dashboard/$siteId/settings",
         "/dashboard/$siteId/",
         "/dashboard/$siteId/pages/$pageId",
+        "/dashboard/$siteId/chats/",
         "/dashboard/$siteId/pages/"
       ]
     },
@@ -419,10 +419,6 @@ export const routeTree = rootRoute
       "filePath": "dashboard/$siteId/agents.tsx",
       "parent": "/dashboard/$siteId"
     },
-    "/dashboard/$siteId/chats": {
-      "filePath": "dashboard/$siteId/chats.tsx",
-      "parent": "/dashboard/$siteId"
-    },
     "/dashboard/$siteId/documents": {
       "filePath": "dashboard/$siteId/documents.tsx",
       "parent": "/dashboard/$siteId"
@@ -437,6 +433,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/$siteId/pages/$pageId": {
       "filePath": "dashboard/$siteId/pages/$pageId.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/chats/": {
+      "filePath": "dashboard/$siteId/chats/index.tsx",
       "parent": "/dashboard/$siteId"
     },
     "/dashboard/$siteId/pages/": {

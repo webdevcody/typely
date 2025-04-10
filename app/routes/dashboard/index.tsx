@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useEffect } from "react";
+import { Button } from "../../components/ui/button";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -16,6 +17,10 @@ function RouteComponent() {
     if (sites && sites.length === 1) {
       navigate({ to: "/dashboard/$siteId", params: { siteId: sites[0]._id } });
     }
+
+    if (sites && sites.length === 0) {
+      navigate({ to: "/onboarding" });
+    }
   }, [sites, navigate]);
 
   if (isLoading) {
@@ -29,9 +34,12 @@ function RouteComponent() {
 
   if (!sites || sites.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-2xl font-bold mb-4">No Sites Found</h1>
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <h1 className="text-2xl font-bold">No Sites Found</h1>
         <p className="text-gray-600">Create your first site to get started</p>
+        <Button onClick={() => navigate({ to: "/onboarding" })}>
+          Create a Site
+        </Button>
       </div>
     );
   }

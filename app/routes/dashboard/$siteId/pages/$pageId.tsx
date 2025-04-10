@@ -13,11 +13,10 @@ export const Route = createFileRoute("/dashboard/$siteId/pages/$pageId")({
 });
 
 function RouteComponent() {
-  const { siteId, pageId } = Route.useParams();
+  const { pageId } = Route.useParams();
 
   const { data: page } = useQuery(
     convexQuery(api.pages.getPageById, {
-      siteId: siteId as Id<"sites">,
       pageId: pageId as Id<"pages">,
     })
   );

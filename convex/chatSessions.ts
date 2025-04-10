@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation, mutation, internalQuery } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 
 export const createChatSession = internalMutation({
   args: {

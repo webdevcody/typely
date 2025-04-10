@@ -10,6 +10,7 @@
 
 import type * as agent from "../agent.js";
 import type * as auth from "../auth.js";
+import type * as authorization from "../authorization.js";
 import type * as chatMessages from "../chatMessages.js";
 import type * as chatSessions from "../chatSessions.js";
 import type * as crawler from "../crawler.js";
@@ -37,6 +38,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   agent: typeof agent;
   auth: typeof auth;
+  authorization: typeof authorization;
   chatMessages: typeof chatMessages;
   chatSessions: typeof chatSessions;
   crawler: typeof crawler;

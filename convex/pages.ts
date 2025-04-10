@@ -1,25 +1,16 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { Doc } from "./_generated/dataModel";
+import { isSiteAdmin } from "./authorization";
 
 export const getPagesBySiteId = query({
   args: {
     siteId: v.id("sites"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return [];
-    }
-
-    const site = await ctx.db.get(args.siteId);
+    const site = await isSiteAdmin(ctx, args.siteId);
 
     if (!site) {
-      return [];
-    }
-
-    if (site.userId !== userId) {
       return [];
     }
 
@@ -117,23 +108,16 @@ export const createPage = internalMutation({
 export const getPageById = query({
   args: {
     pageId: v.id("pages"),
-    siteId: v.id("sites"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const page = await ctx.db.get(args.pageId);
+    if (!page) {
       return null;
     }
 
-    const site = await ctx.db.get(args.siteId);
-    if (!site || site.userId !== userId) {
-      throw new Error("Not authorized to access this site");
-    }
-
-    // Get the page and verify it belongs to the site
-    const page = await ctx.db.get(args.pageId);
-    if (!page || page.siteId !== args.siteId) {
-      throw new Error("Page not found or not authorized");
+    const site = await isSiteAdmin(ctx, page.siteId);
+    if (!site) {
+      return null;
     }
 
     return page;
