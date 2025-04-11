@@ -6,7 +6,15 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { FileText, MessageSquare, Upload, Pencil, Trash2 } from "lucide-react";
+import {
+  FileText,
+  MessageSquare,
+  Upload,
+  Pencil,
+  Trash2,
+  FileX,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation } from "convex/react";
@@ -106,8 +114,38 @@ function RouteComponent() {
   const renderContextList = (contexts: any[] | undefined) => {
     if (!contexts || contexts.length === 0) {
       return (
-        <div className="text-center py-8 text-muted-foreground">
-          No contexts found
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="relative mb-8">
+            <div className="h-24 w-24 text-primary/20 animate-pulse">
+              <FileX className="h-full w-full" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white">
+              <Plus className="h-5 w-5" />
+            </div>
+          </div>
+
+          <h3 className="font-semibold text-2xl mb-3 text-center">
+            Your Knowledge Base Awaits
+          </h3>
+
+          <div className="space-y-4 text-center max-w-md mb-8">
+            <p className="text-muted-foreground">
+              Train your AI assistant by adding contexts - documents, FAQs, or
+              any important information you want your AI to learn from.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Your AI becomes smarter with each context you add, providing more
+              accurate and relevant responses.
+            </p>
+          </div>
+
+          <button
+            onClick={() => {}} // You'll need to wire this up to your add context handler
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            Add Your First Context
+          </button>
         </div>
       );
     }

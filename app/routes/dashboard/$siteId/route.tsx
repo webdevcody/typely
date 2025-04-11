@@ -17,10 +17,16 @@ import {
   MessageSquare,
   Bot,
   Files,
+  Search,
+  BarChart4,
+  Wallet,
+  LineChart,
 } from "lucide-react";
 
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { SiteSelector } from "@/components/site-selector";
 
 const sidebarNavItems = [
   {
@@ -91,39 +97,81 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-65px)]">
+    <div className="flex h-screen bg-[#0D0F12]">
       {/* Sidebar */}
-      <aside className="fixed left-0 w-64 h-full border-r bg-white dark:bg-gray-950 dark:border-gray-800">
-        <nav className="flex flex-col gap-1 p-4">
-          {sidebarNavItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                params={{ siteId: siteId }}
-                activeProps={{
-                  className:
-                    "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100",
-                }}
-                activeOptions={{
-                  exact: item.href === "/dashboard/$siteId",
-                }}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
-      <main className="flex-1 overflow-auto ml-64 p-8">
-        <div className="mx-auto max-w-6xl">
-          <Outlet />
+      <aside className="fixed left-0 w-64 h-full bg-[#141518] border-r border-[#262932]">
+        <div className="flex flex-col h-full">
+          {/* Logo and Site Selector */}
+          <div className="p-4 border-b border-[#262932]">
+            <div className="flex items-center gap-3 mb-3">
+              <img src="/icon.png" alt="Logo" className="w-8 h-8" />
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-semibold text-white">Site Sensei</h2>
+                  <span className="text-xs bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full">
+                    BETA
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400">All-In-One Site Manager</p>
+              </div>
+            </div>
+            <SiteSelector />
+          </div>
+
+          {/* Search Bar */}
+          <div className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Search anything..."
+                className="w-full bg-[#1C1F26] border-none pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#262932]"
+              />
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4">
+            <ul className="space-y-1">
+              {sidebarNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      to={item.href}
+                      params={{ siteId: siteId }}
+                      activeProps={{
+                        className: "bg-[#1C1F26] text-white",
+                      }}
+                      activeOptions={{
+                        exact: item.href === "/dashboard/$siteId",
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26]"
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* Support Section */}
+          <div className="p-4 border-t border-[#262932]">
+            <button className="flex items-center gap-3 rounded-md px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] w-full">
+              <MessageSquare className="h-5 w-5" />
+              <span>Support</span>
+            </button>
+          </div>
         </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 ml-64">
+        <Outlet />
       </main>
     </div>
   );

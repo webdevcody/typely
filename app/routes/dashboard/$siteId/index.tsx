@@ -56,97 +56,135 @@ function RouteComponent() {
   };
 
   return (
-    <div className="space-y-4">
-      {isLoading ? (
-        <Skeleton type="title" />
-      ) : (
-        <h1 className="text-3xl font-bold">{site.name}</h1>
-      )}
-
-      <div className="flex items-center gap-4">
-        {isLoading ? (
-          <Skeleton type="description" />
-        ) : (
-          <p className="text-gray-500">{site.url}</p>
-        )}
-
-        {isLoading ? (
-          <Skeleton type="badge" />
-        ) : (
-          <Badge
-            variant={
-              site.crawlStatus === "completed"
-                ? "default"
-                : site.crawlStatus === "failed"
-                  ? "destructive"
-                  : "secondary"
-            }
-          >
-            {site.crawlStatus}
-          </Badge>
-        )}
+    <div className="p-8 space-y-6 bg-[#0D0F12] min-h-full">
+      {/* Header Section */}
+      <div className="flex items-center gap-2 text-gray-400 mb-6">
+        <span>Dashboard</span>
+        <span>/</span>
+        <span className="text-white">Overview</span>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
+      {/* Site Info Panel */}
+      <div className="rounded-2xl bg-[#141518] p-8">
+        <div className="space-y-2">
+          {isLoading ? (
+            <Skeleton type="title" />
+          ) : (
+            <h1 className="text-3xl font-bold text-white">{site.name}</h1>
+          )}
+
           <div className="flex items-center gap-4">
-            <Files className="h-8 w-8 text-gray-400" />
-            <div>
-              <h3 className="font-semibold">Total Pages</h3>
-              <p className="text-2xl font-bold">{totalPages}</p>
-            </div>
+            {isLoading ? (
+              <Skeleton type="description" />
+            ) : (
+              <p className="text-gray-400">{site.url}</p>
+            )}
+
+            {isLoading ? (
+              <Skeleton type="badge" />
+            ) : (
+              <Badge
+                variant={
+                  site.crawlStatus === "completed"
+                    ? "default"
+                    : site.crawlStatus === "failed"
+                      ? "destructive"
+                      : "secondary"
+                }
+                className="bg-[#1C1F26] text-gray-300 hover:bg-[#262932]"
+              >
+                {site.crawlStatus}
+              </Badge>
+            )}
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <CheckCircle className="h-8 w-8 text-green-400" />
-            <div>
-              <h3 className="font-semibold">Indexed Pages</h3>
-              <p className="text-2xl font-bold">{successPages}</p>
+        {/* Stats Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-8">
+          <div className="rounded-xl bg-[#1C1F26] p-6">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-blue-500/10 p-3">
+                <Files className="h-6 w-6 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-400">Total Pages</p>
+                <p className="text-2xl font-bold text-white">
+                  {totalPages || 0}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <Clock className="h-8 w-8 text-yellow-400" />
-            <div>
-              <h3 className="font-semibold">Pending Pages</h3>
-              <p className="text-2xl font-bold">{pendingPages}</p>
+          <div className="rounded-xl bg-[#1C1F26] p-6">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-green-500/10 p-3">
+                <CheckCircle className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-400">
+                  Indexed Pages
+                </p>
+                <p className="text-2xl font-bold text-white">
+                  {successPages || 0}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <XCircle className="h-8 w-8 text-red-400" />
-            <div>
-              <h3 className="font-semibold">Failed Pages</h3>
-              <p className="text-2xl font-bold">{failedPages}</p>
+          <div className="rounded-xl bg-[#1C1F26] p-6">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-yellow-500/10 p-3">
+                <Clock className="h-6 w-6 text-yellow-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-400">
+                  Pending Pages
+                </p>
+                <p className="text-2xl font-bold text-white">
+                  {pendingPages || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-[#1C1F26] p-6">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-red-500/10 p-3">
+                <XCircle className="h-6 w-6 text-red-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-400">
+                  Failed Pages
+                </p>
+                <p className="text-2xl font-bold text-white">
+                  {failedPages || 0}
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Failed Pages Panel */}
       {failedPages !== undefined && failedPages > 0 && (
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Failed Pages</h2>
+        <div className="rounded-2xl bg-[#141518] p-8">
+          <h2 className="text-xl font-bold text-white mb-6">Failed Pages</h2>
           <div className="space-y-4">
             {pages
               ?.filter((page) => page.crawlStatus === "failed")
               .map((page) => (
                 <div
                   key={page._id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between p-4 rounded-lg bg-[#1C1F26] border border-[#262932]"
                 >
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-5 w-5 text-red-500" />
-                    <span>{page.url}</span>
+                    <span className="text-gray-300">{page.url}</span>
                   </div>
                   <Button
                     variant="outline"
                     onClick={() => handleReindex(page.url)}
+                    className="border-[#262932] text-gray-300 hover:bg-[#262932] hover:text-white"
                   >
                     Reindex
                   </Button>

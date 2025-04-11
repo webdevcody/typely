@@ -50,7 +50,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <div className="flex min-h-screen flex-col">
-        <Header />
+        {!routerState.location.pathname.startsWith("/dashboard") && <Header />}
         <main className="flex-1">
           <Outlet />
         </main>
