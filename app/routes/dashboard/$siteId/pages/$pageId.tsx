@@ -1,27 +1,45 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw, Globe, Calendar, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { useAction, useMutation } from "convex/react";
+import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/dashboard/$siteId/pages/$pageId")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { pageId } = Route.useParams();
+  const { pageId, siteId } = Route.useParams();
+  const reindexPage = useMutation(api.pages.reindexPage);
 
-  const { data: page } = useQuery(
+  const { data: page, isLoading } = useQuery(
     convexQuery(api.pages.getPageById, {
       pageId: pageId as Id<"pages">,
     })
   );
 
-  if (!page) {
+  const isPageCrawling = page?.crawlStatus === "crawling";
+
+  const handleReindex = async () => {
+    try {
+      await reindexPage({ pageId: pageId as Id<"pages"> });
+      toast.success("Reindexing started");
+    } catch (error) {
+      toast.error("Failed to start reindexing");
+    }
+  };
+
+  if (isLoading || !page) {
     return (
       <div className="container mx-auto flex items-center justify-center p-8">
         <Loader2 className="animate-spin h-8 w-8 text-indigo-600 dark:text-indigo-400" />
@@ -30,55 +48,107 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold truncate dark:text-white">
+    <div className="space-y-6 overflow-x-hidden">
+      <div className="flex items-center gap-4">
+        <Link
+          to="/dashboard/$siteId/pages"
+          params={{ siteId }}
+          className="hover:text-accent-foreground"
+        >
+          <Button variant="outline" size="icon" className="h-9 w-9">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Back to pages</span>
+          </Button>
+        </Link>
+        <div className="flex flex-1 items-center justify-between">
+          <h1 className="text-3xl font-bold">
             <a
               href={page.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
+              className="flex items-center gap-4 text-3xl font-medium hover:underline break-all"
             >
+              <Globe className="size-8 text-muted-foreground flex-shrink-0" />
               {page.url}
             </a>
           </h1>
-          <span
-            className={cn(
-              "text-sm px-3 py-1 rounded-full",
-              page.crawlStatus === "completed"
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : page.crawlStatus === "failed"
-                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                  : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-            )}
+          <Button
+            onClick={handleReindex}
+            variant="outline"
+            size="sm"
+            disabled={isPageCrawling}
           >
-            {page.crawlStatus}
-          </span>
+            {isPageCrawling ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
+            {isPageCrawling ? "Reindexing..." : "Reindex"}
+          </Button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Created:</span>{" "}
-            <span className="dark:text-white">
-              {format(new Date(page._creationTime), "PPpp")}
-            </span>
-          </div>
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">
-              Last Updated:
-            </span>{" "}
-            <span className="dark:text-white">
-              {format(new Date(page.updatedAt || page._creationTime), "PPpp")}
-            </span>
-          </div>
-        </div>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span
+                className={cn(
+                  "text-sm px-3 py-1 rounded-full",
+                  page.crawlStatus === "completed"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : page.crawlStatus === "failed"
+                      ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                      : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
+                )}
+              >
+                {page.crawlStatus}
+              </span>
+            </div>
 
-        <div className="prose dark:prose-invert max-w-none">
-          <ReactMarkdown>
-            {page.markdown || "No content available"}
-          </ReactMarkdown>
-        </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  First Index {format(new Date(page._creationTime), "PPpp")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  Last Updated{" "}
+                  {format(
+                    new Date(page.updatedAt || page._creationTime),
+                    "PPpp"
+                  )}
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        <h2 className="text-2xl font-bold">Parsed Content</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="prose dark:prose-invert max-w-none p-1">
+              <ReactMarkdown
+                components={{
+                  code: ({ node, ...props }) => (
+                    <code
+                      className="break-all whitespace-pre-wrap"
+                      {...props}
+                    />
+                  ),
+                  pre: ({ node, ...props }) => (
+                    <pre className="break-all whitespace-pre-wrap" {...props} />
+                  ),
+                }}
+              >
+                {page.markdown || "No content available"}
+              </ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -47,7 +47,7 @@ export function Step2() {
   };
 
   return (
-    <div>
+    <div className="text-center max-w-2xl mx-auto pt-12">
       <h2 className="text-2xl font-bold mb-6">Enter Your Website Details</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
@@ -78,22 +78,17 @@ export function Step2() {
             Enter the full URL of your sitemap.xml file.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-between">
           <Button
             type="button"
             variant="outline"
             onClick={() =>
               navigate({ to: "/onboarding/$step", params: { step: "1" } })
             }
-            className="cursor-pointer flex-1"
           >
             Back
           </Button>
-          <Button
-            type="submit"
-            className="cursor-pointer flex-1 bg-indigo-600 hover:bg-indigo-500"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="animate-spin" />

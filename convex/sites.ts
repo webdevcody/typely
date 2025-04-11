@@ -9,6 +9,7 @@ import {
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { workflow } from ".";
+import { isSiteAdmin } from "./authorization";
 
 export const getUserSites = query({
   args: {},
@@ -93,30 +94,20 @@ export const updateSiteCrawlStatus = internalMutation({
   },
 });
 
-export const indexSite = action({
+export const reindexSite = mutation({
   args: {
     siteId: v.id("sites"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("You must be logged in to index a site");
-    }
-    const site = await ctx.runQuery(internal.sites._getSite, {
-      siteId: args.siteId,
-    });
+    const site = await isSiteAdmin(ctx, args.siteId);
 
     if (!site) {
-      throw new Error("Site not found");
+      throw new Error("You are not authorized to reindex this site");
     }
 
-    if (site.userId !== userId) {
-      throw new Error("You are not authorized to index this site");
-    }
-
-    await workflow.start(ctx, internal.crawler.crawlSiteWorkflow, {
+    await ctx.scheduler.runAfter(0, internal.crawler.crawlSiteWorkflow, {
       siteId: args.siteId,
-      userId: userId,
+      userId: site.site.userId,
     });
   },
 });

@@ -5,7 +5,7 @@ export function Step1() {
   const navigate = useNavigate();
 
   return (
-    <div className="text-center">
+    <div className="text-center max-w-2xl mx-auto pt-12">
       <h1 className="text-3xl font-bold mb-6">Adding your First Site</h1>
       <p className="text-gray-600 mb-8">
         Let's start by letting the Sensei learn all about your site! We'll crawl
@@ -18,7 +18,6 @@ export function Step1() {
         onClick={() =>
           navigate({ to: "/onboarding/$step", params: { step: "2" } })
         }
-        className="bg-indigo-600 hover:bg-indigo-500"
       >
         Get Started
       </Button>

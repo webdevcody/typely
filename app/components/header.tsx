@@ -7,7 +7,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Loader2, LogOut, Menu, Settings } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +21,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ModeToggle } from "./mode-toggle";
+import { SiteSelector } from "./site-selector";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -33,6 +34,7 @@ export function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const currentUser = useCurrentUser();
   const { isLoading } = useConvexAuth();
+  const routerState = useRouterState();
 
   const handleSignOut = () => {
     signOut();
@@ -42,8 +44,8 @@ export function Header() {
   return (
     <header className="border-b sticky top-0 z-50 bg-background">
       <nav className="mx-auto flex items-center justify-between p-4 lg:px-8">
-        {/* Logo */}
-        <div className="flex lg:flex-1">
+        {/* Logo and Site Selector */}
+        <div className="flex gap-8 items-center justify-center flex-1 basis-0">
           <Link
             to="/"
             className="font-bold text-xl flex items-center gap-2 text-foreground"
@@ -51,10 +53,16 @@ export function Header() {
             <img className="size-12" src="/icon.png" />
             SITE SENSEI
           </Link>
+
+          {routerState.location.pathname.startsWith("/dashboard") && (
+            <Authenticated>
+              <SiteSelector />
+            </Authenticated>
+          )}
         </div>
 
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex lg:gap-x-12">
+        {/* Desktop Navigation - Centered */}
+        <div className="hidden lg:flex lg:gap-x-12 flex-1 justify-center">
           {navigation.map((item) => (
             <Link
               key={item.name}
@@ -67,7 +75,7 @@ export function Header() {
         </div>
 
         {/* Desktop Auth Section */}
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 items-center">
+        <div className="hidden lg:flex items-center gap-x-4 flex-1 basis-0 justify-end">
           <ModeToggle />
           {isLoading && (
             <div className="flex items-center justify-center h-8 w-8 bg-muted animate-pulse rounded-full">
@@ -139,6 +147,11 @@ export function Header() {
               </SheetHeader>
 
               <div className="flex flex-col px-6">
+                <Authenticated>
+                  <div className="py-6">
+                    <SiteSelector />
+                  </div>
+                </Authenticated>
                 <div className="space-y-4 py-6">
                   {navigation.map((item) => (
                     <Link

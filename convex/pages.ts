@@ -1,7 +1,14 @@
 import { v } from "convex/values";
-import { internalMutation, internalQuery, query } from "./_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "./_generated/server";
 import { Doc } from "./_generated/dataModel";
 import { isSiteAdmin } from "./authorization";
+import { internal } from "./_generated/api";
 
 export const getPagesBySiteId = query({
   args: {
@@ -18,6 +25,20 @@ export const getPagesBySiteId = query({
       .query("pages")
       .withIndex("by_siteId", (q) => q.eq("siteId", args.siteId))
       .collect();
+  },
+});
+
+export const _getPagesBySiteIds = internalQuery({
+  args: {
+    siteIds: v.array(v.id("sites")),
+  },
+  handler: async (ctx, args) => {
+    const pages = await Promise.all(
+      args.siteIds.map(async (siteId) => {
+        return await ctx.db.get(siteId);
+      })
+    );
+    return pages;
   },
 });
 
@@ -121,5 +142,75 @@ export const getPageById = query({
     }
 
     return page;
+  },
+});
+
+export const _getPage = internalQuery({
+  args: {
+    pageId: v.id("pages"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.pageId);
+  },
+});
+
+export const reindexPage = mutation({
+  args: {
+    pageId: v.id("pages"),
+  },
+  handler: async (ctx, args) => {
+    const page = await ctx.runQuery(internal.pages._getPage, {
+      pageId: args.pageId,
+    });
+
+    if (!page) {
+      throw new Error("Page not found");
+    }
+
+    const site = await isSiteAdmin(ctx, page.siteId);
+
+    if (!site) {
+      throw new Error("You are not authorized to reindex this page");
+    }
+
+    await ctx.scheduler.runAfter(0, internal.crawler.indexPage, {
+      url: page.url,
+      siteId: page.siteId,
+    });
+  },
+});
+
+export const getRelevantPages = internalAction({
+  args: {
+    siteId: v.id("sites"),
+    query: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const results = await ctx.vectorSearch("pages", "embeddings", {
+      vector: args.query,
+      limit: 3,
+      filter: (q) => q.eq("siteId", args.siteId),
+    });
+
+    const pages: Doc<"pages">[] = await ctx.runQuery(
+      internal.pages._getPagesByIds,
+      { ids: results.map((result) => result._id) }
+    );
+
+    return pages;
+  },
+});
+
+export const _getPagesByIds = internalQuery({
+  args: {
+    ids: v.array(v.id("pages")),
+  },
+  handler: async (ctx, args) => {
+    const pages = await Promise.all(
+      args.ids.map(async (id) => {
+        return await ctx.db.get(id);
+      })
+    );
+    return pages.filter((page) => page !== null);
   },
 });

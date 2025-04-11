@@ -39,7 +39,12 @@ const sidebarNavItems = [
   //   icon: FileText,
   // },
   {
-    title: "Chats",
+    title: "Context",
+    href: "/dashboard/$siteId/context",
+    icon: FileText,
+  },
+  {
+    title: "Sessions",
     href: "/dashboard/$siteId/chats",
     icon: MessageSquare,
   },

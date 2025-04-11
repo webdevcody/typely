@@ -8,3 +8,5 @@ export const workflow = new WorkflowManager(components.workflow);
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+export const EMBEDDING_MODEL = "text-embedding-3-small";

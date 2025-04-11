@@ -17,6 +17,21 @@ const schema = defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+  contexts: defineTable({
+    siteId: v.id("sites"),
+    type: v.union(v.literal("text"), v.literal("file"), v.literal("faq")),
+    title: v.string(),
+    content: v.string(),
+    embeddings: v.array(v.float64()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_siteId", ["siteId"])
+    .vectorIndex("embeddings", {
+      vectorField: "embeddings",
+      dimensions: 1536,
+      filterFields: ["siteId"],
+    }),
   pages: defineTable({
     url: v.string(),
     siteId: v.id("sites"),
@@ -28,12 +43,17 @@ const schema = defineSchema({
       v.literal("completed"),
       v.literal("failed")
     ),
-    embeddings: v.array(v.number()),
+    embeddings: v.array(v.float64()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_siteId_url", ["siteId", "url"])
-    .index("by_siteId", ["siteId"]),
+    .index("by_siteId", ["siteId"])
+    .vectorIndex("embeddings", {
+      vectorField: "embeddings",
+      dimensions: 1536,
+      filterFields: ["siteId"],
+    }),
   chatSessions: defineTable({
     siteId: v.id("sites"),
     createdAt: v.number(),

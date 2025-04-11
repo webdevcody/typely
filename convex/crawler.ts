@@ -1,7 +1,9 @@
 import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { openai, workflow } from ".";
+import { EMBEDDING_MODEL, openai, workflow } from ".";
+import { convertToMarkdown } from "./converters";
+import { createEmbeddings } from "./agent";
 
 export const crawlSiteWorkflow = workflow.define({
   args: { siteId: v.id("sites"), userId: v.id("users") },
@@ -74,47 +76,33 @@ export const indexPage = internalAction({
       crawlStatus: "crawling",
     });
 
-    const pageResponse = await fetch(args.url);
-    const html = await pageResponse.text();
+    try {
+      const pageResponse = await fetch(args.url);
+      const html = await pageResponse.text();
 
-    const markdown = await convertToMarkdown(html);
+      const markdown = await ctx.runAction(
+        internal.converters.convertToMarkdown,
+        {
+          html: html,
+        }
+      );
 
-    if (!markdown) {
-      throw new Error("Failed to convert HTML to Markdown");
+      const embeddings = await createEmbeddings(markdown);
+
+      // save embedding
+      await ctx.runMutation(internal.pages.updatePage, {
+        pageId: pageId,
+        embeddings: embeddings,
+        crawlStatus: "completed",
+        html: html,
+        markdown: markdown,
+      });
+    } catch (err) {
+      console.error(err);
+      await ctx.runMutation(internal.pages.updatePage, {
+        pageId: pageId,
+        crawlStatus: "failed",
+      });
     }
-
-    const embeddings = await createEmbeddings(markdown);
-
-    // save embedding
-    await ctx.runMutation(internal.pages.updatePage, {
-      pageId: pageId,
-      embeddings: embeddings,
-      crawlStatus: "completed",
-      html: html,
-      markdown: markdown,
-    });
   },
 });
-
-async function convertToMarkdown(html: string) {
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: `Convert the following HTML to Markdown.`,
-      },
-      { role: "user", content: html },
-    ],
-  });
-  return response.choices[0].message.content;
-}
-
-async function createEmbeddings(text: string) {
-  const response = await openai.embeddings.create({
-    model: "text-embedding-ada-002",
-    input: text,
-  });
-  const embeddings = response.data[0].embedding;
-  return embeddings;
-}

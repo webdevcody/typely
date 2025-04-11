@@ -7,7 +7,7 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ function RouteComponent() {
       siteId: siteId as Id<"sites">,
     })
   );
-  const indexSite = useAction(api.sites.indexSite);
+  const reindexSite = useMutation(api.sites.reindexSite);
 
   const isLoading = !site || !pages;
 
@@ -48,7 +48,7 @@ function RouteComponent() {
 
   const handleReindex = async (pageUrl: string) => {
     try {
-      await indexSite({ siteId: siteId as Id<"sites"> });
+      await reindexSite({ siteId: siteId as Id<"sites"> });
       toast.success("Reindexing started");
     } catch (error) {
       toast.error("Failed to start reindexing");
