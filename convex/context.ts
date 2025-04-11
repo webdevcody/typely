@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import {
   mutation,
-  action,
   internalAction,
   internalMutation,
   internalQuery,
@@ -10,13 +9,9 @@ import {
 import { isSiteAdmin } from "./authorization";
 import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
-import {
-  DatabaseReader,
-  DatabaseWriter,
-  ActionCtx,
-  QueryCtx,
-} from "./_generated/server";
+import { QueryCtx } from "./_generated/server";
 import { createEmbeddings } from "./agent";
+import { MAX_RELEVANT_CONTEXT_RESULTS } from ".";
 
 export const generateContextEmbedding = internalAction({
   args: {
@@ -199,7 +194,7 @@ export const getRelevantContexts = internalAction({
   handler: async (ctx, args) => {
     const results = await ctx.vectorSearch("contexts", "embeddings", {
       vector: args.query,
-      limit: 3,
+      limit: MAX_RELEVANT_CONTEXT_RESULTS,
       filter: (q) => q.eq("siteId", args.siteId),
     });
 
@@ -241,7 +236,106 @@ export const deleteContext = mutation({
       throw new Error("You are not authorized to delete this context");
     }
 
+    const storageId = context.storageId;
+    if (storageId) {
+      await ctx.storage.delete(storageId);
+    }
+
     await ctx.db.delete(args.contextId);
     return args.contextId;
+  },
+});
+
+export const generateUploadUrl = mutation({
+  args: {
+    siteId: v.id("sites"),
+  },
+  handler: async (ctx, args) => {
+    const site = await isSiteAdmin(ctx, args.siteId);
+    if (!site) {
+      throw new Error("You are not authorized to add context to this site");
+    }
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const saveFileContext = mutation({
+  args: {
+    siteId: v.id("sites"),
+    title: v.string(),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const site = await isSiteAdmin(ctx, args.siteId);
+    if (!site) {
+      throw new Error("You are not authorized to add context to this site");
+    }
+
+    // Schedule the file content fetching and context creation
+    await ctx.scheduler.runAfter(0, internal.context.processFileContent, {
+      siteId: args.siteId,
+      title: args.title,
+      storageId: args.storageId,
+    });
+  },
+});
+
+export const processFileContent = internalAction({
+  args: {
+    siteId: v.id("sites"),
+    title: v.string(),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args): Promise<Id<"contexts">> => {
+    // Get the file content from storage
+    const fileUrl = await ctx.storage.getUrl(args.storageId);
+    if (!fileUrl) {
+      throw new Error("File not found");
+    }
+
+    // Fetch and convert the file to text
+    const response = await fetch(fileUrl);
+    const content = await response.text();
+
+    // Save the context
+    const contextId = await ctx.runMutation(
+      internal.context.createFileContext,
+      {
+        siteId: args.siteId,
+        title: args.title,
+        content,
+        storageId: args.storageId,
+      }
+    );
+
+    return contextId;
+  },
+});
+
+export const createFileContext = internalMutation({
+  args: {
+    siteId: v.id("sites"),
+    title: v.string(),
+    content: v.string(),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args): Promise<Id<"contexts">> => {
+    const now = Date.now();
+    const contextId = await ctx.db.insert("contexts", {
+      siteId: args.siteId,
+      type: "file",
+      title: args.title,
+      content: args.content,
+      embeddings: [],
+      createdAt: now,
+      updatedAt: now,
+      storageId: args.storageId,
+    });
+
+    await ctx.scheduler.runAfter(0, internal.context.generateContextEmbedding, {
+      contextId: contextId,
+    });
+
+    return contextId;
   },
 });

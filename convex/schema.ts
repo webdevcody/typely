@@ -22,6 +22,7 @@ const schema = defineSchema({
     type: v.union(v.literal("text"), v.literal("file"), v.literal("faq")),
     title: v.string(),
     content: v.string(),
+    storageId: v.optional(v.id("_storage")),
     embeddings: v.array(v.float64()),
     createdAt: v.number(),
     updatedAt: v.number(),

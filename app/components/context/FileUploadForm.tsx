@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "convex/_generated/api";
+import { useParams, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Id } from "convex/_generated/dataModel";
 
 export function FileUploadForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const generateUploadUrl = useMutation(api.context.generateUploadUrl);
+  const saveFileContext = useMutation(api.context.saveFileContext);
+  const { siteId } = useParams({ from: "/dashboard/$siteId/context/add" });
+  const navigate = useNavigate();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -36,8 +46,40 @@ export function FileUploadForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement file upload logic
-    console.log("Files to upload:", files);
+    if (files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of files) {
+        // Step 1: Get the upload URL
+        const postUrl = await generateUploadUrl({
+          siteId: siteId as Id<"sites">,
+        });
+
+        // Step 2: Upload the file
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        const { storageId } = await result.json();
+
+        // Step 3: Save the file context
+        await saveFileContext({
+          siteId: siteId as Id<"sites">,
+          title: file.name,
+          storageId,
+        });
+      }
+
+      toast.success("Files uploaded successfully");
+      navigate({ to: "/dashboard/$siteId/context", params: { siteId } });
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload files");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -54,15 +96,20 @@ export function FileUploadForm() {
         <div className="mt-4">
           <p className="text-sm font-medium">Drag and drop your files here</p>
           <p className="text-sm text-muted-foreground">or</p>
-          <label className="mt-2 cursor-pointer">
+          <label htmlFor="file-upload" className="mt-2 cursor-pointer">
             <Input
+              id="file-upload"
               type="file"
               multiple
               className="hidden"
               onChange={handleFileInput}
               accept=".txt,.pdf,.doc,.docx"
             />
-            <Button type="button" variant="outline">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById("file-upload")?.click()}
+            >
               Browse Files
             </Button>
           </label>
@@ -92,8 +139,15 @@ export function FileUploadForm() {
       )}
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={files.length === 0}>
-          Upload Files
+        <Button type="submit" disabled={files.length === 0 || isUploading}>
+          {isUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            "Upload Files"
+          )}
         </Button>
       </div>
     </form>

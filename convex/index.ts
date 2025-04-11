@@ -10,3 +10,6 @@ export const openai = new OpenAI({
 });
 
 export const EMBEDDING_MODEL = "text-embedding-3-small";
+
+export const MAX_RELEVANT_CONTEXT_RESULTS = 3;
+export const MAX_RELEVANT_PAGE_RESULTS = 3;

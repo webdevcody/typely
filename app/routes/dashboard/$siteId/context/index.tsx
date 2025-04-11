@@ -76,7 +76,7 @@ function RouteComponent() {
   const { data: fileContexts } = useQuery(
     convexQuery(api.context.getContextsBySiteIdAndType, {
       siteId: siteId as Id<"sites">,
-      type: "file-upload",
+      type: "file",
     })
   );
 

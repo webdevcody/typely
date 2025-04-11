@@ -9,6 +9,7 @@ import {
 import { Doc } from "./_generated/dataModel";
 import { isSiteAdmin } from "./authorization";
 import { internal } from "./_generated/api";
+import { MAX_RELEVANT_PAGE_RESULTS } from ".";
 
 export const getPagesBySiteId = query({
   args: {
@@ -188,7 +189,7 @@ export const getRelevantPages = internalAction({
   handler: async (ctx, args) => {
     const results = await ctx.vectorSearch("pages", "embeddings", {
       vector: args.query,
-      limit: 3,
+      limit: MAX_RELEVANT_PAGE_RESULTS,
       filter: (q) => q.eq("siteId", args.siteId),
     });
 
