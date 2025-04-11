@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "convex/react";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ import { Id } from "convex/_generated/dataModel";
 import { toast } from "sonner";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { LoaderButton } from "@/components/ui/loader-button";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -139,7 +140,13 @@ function RouteComponent() {
             />
 
             <div className="flex justify-end">
-              <Button type="submit">Update Context</Button>
+              <LoaderButton
+                type="submit"
+                loading={form.formState.isSubmitting}
+                loadingText="Updating..."
+              >
+                Update Context
+              </LoaderButton>
             </div>
           </form>
         </Form>

@@ -147,6 +147,7 @@ export const createTextContext = mutation({
     siteId: v.id("sites"),
     title: v.string(),
     content: v.string(),
+    type: v.union(v.literal("text"), v.literal("file"), v.literal("faq")),
   },
   handler: async (ctx, args) => {
     const site = await isSiteAdmin(ctx, args.siteId);
@@ -157,7 +158,7 @@ export const createTextContext = mutation({
     const now = Date.now();
     const contextId = await ctx.db.insert("contexts", {
       siteId: args.siteId,
-      type: "text",
+      type: args.type,
       title: args.title,
       content: args.content,
       embeddings: [],

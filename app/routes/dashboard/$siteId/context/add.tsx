@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FileUploadForm } from "@/components/context/FileUploadForm";
 import { TextInputForm } from "@/components/context/TextInputForm";
 import { FAQBuilderForm } from "@/components/context/FAQBuilderForm";
+import { Id } from "convex/_generated/dataModel";
 
 export const Route = createFileRoute("/dashboard/$siteId/context/add")({
   component: RouteComponent,
@@ -25,7 +26,7 @@ function RouteComponent() {
       case "text":
         return <TextInputForm />;
       case "faq":
-        return <FAQBuilderForm />;
+        return <FAQBuilderForm siteId={siteId as Id<"sites">} />;
       default:
         return (
           <div className="text-center">

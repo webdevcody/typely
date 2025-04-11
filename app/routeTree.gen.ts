@@ -26,6 +26,7 @@ import { Route as DashboardSiteIdPagesIndexImport } from './routes/dashboard/$si
 import { Route as DashboardSiteIdContextIndexImport } from './routes/dashboard/$siteId/context/index'
 import { Route as DashboardSiteIdChatsIndexImport } from './routes/dashboard/$siteId/chats/index'
 import { Route as DashboardSiteIdPagesPageIdImport } from './routes/dashboard/$siteId/pages/$pageId'
+import { Route as DashboardSiteIdContextEditFaqImport } from './routes/dashboard/$siteId/context/edit-faq'
 import { Route as DashboardSiteIdContextEditImport } from './routes/dashboard/$siteId/context/edit'
 import { Route as DashboardSiteIdContextAddImport } from './routes/dashboard/$siteId/context/add'
 
@@ -123,6 +124,13 @@ const DashboardSiteIdPagesPageIdRoute = DashboardSiteIdPagesPageIdImport.update(
     getParentRoute: () => DashboardSiteIdRouteRoute,
   } as any,
 )
+
+const DashboardSiteIdContextEditFaqRoute =
+  DashboardSiteIdContextEditFaqImport.update({
+    id: '/context/edit-faq',
+    path: '/context/edit-faq',
+    getParentRoute: () => DashboardSiteIdRouteRoute,
+  } as any)
 
 const DashboardSiteIdContextEditRoute = DashboardSiteIdContextEditImport.update(
   {
@@ -233,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSiteIdContextEditImport
       parentRoute: typeof DashboardSiteIdRouteImport
     }
+    '/dashboard/$siteId/context/edit-faq': {
+      id: '/dashboard/$siteId/context/edit-faq'
+      path: '/context/edit-faq'
+      fullPath: '/dashboard/$siteId/context/edit-faq'
+      preLoaderRoute: typeof DashboardSiteIdContextEditFaqImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
     '/dashboard/$siteId/pages/$pageId': {
       id: '/dashboard/$siteId/pages/$pageId'
       path: '/pages/$pageId'
@@ -273,6 +288,7 @@ interface DashboardSiteIdRouteRouteChildren {
   DashboardSiteIdIndexRoute: typeof DashboardSiteIdIndexRoute
   DashboardSiteIdContextAddRoute: typeof DashboardSiteIdContextAddRoute
   DashboardSiteIdContextEditRoute: typeof DashboardSiteIdContextEditRoute
+  DashboardSiteIdContextEditFaqRoute: typeof DashboardSiteIdContextEditFaqRoute
   DashboardSiteIdPagesPageIdRoute: typeof DashboardSiteIdPagesPageIdRoute
   DashboardSiteIdChatsIndexRoute: typeof DashboardSiteIdChatsIndexRoute
   DashboardSiteIdContextIndexRoute: typeof DashboardSiteIdContextIndexRoute
@@ -286,6 +302,7 @@ const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
   DashboardSiteIdIndexRoute: DashboardSiteIdIndexRoute,
   DashboardSiteIdContextAddRoute: DashboardSiteIdContextAddRoute,
   DashboardSiteIdContextEditRoute: DashboardSiteIdContextEditRoute,
+  DashboardSiteIdContextEditFaqRoute: DashboardSiteIdContextEditFaqRoute,
   DashboardSiteIdPagesPageIdRoute: DashboardSiteIdPagesPageIdRoute,
   DashboardSiteIdChatsIndexRoute: DashboardSiteIdChatsIndexRoute,
   DashboardSiteIdContextIndexRoute: DashboardSiteIdContextIndexRoute,
@@ -309,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
   '/dashboard/$siteId/context/edit': typeof DashboardSiteIdContextEditRoute
+  '/dashboard/$siteId/context/edit-faq': typeof DashboardSiteIdContextEditFaqRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
   '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context': typeof DashboardSiteIdContextIndexRoute
@@ -328,6 +346,7 @@ export interface FileRoutesByTo {
   '/dashboard/$siteId': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
   '/dashboard/$siteId/context/edit': typeof DashboardSiteIdContextEditRoute
+  '/dashboard/$siteId/context/edit-faq': typeof DashboardSiteIdContextEditFaqRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
   '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context': typeof DashboardSiteIdContextIndexRoute
@@ -349,6 +368,7 @@ export interface FileRoutesById {
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
   '/dashboard/$siteId/context/edit': typeof DashboardSiteIdContextEditRoute
+  '/dashboard/$siteId/context/edit-faq': typeof DashboardSiteIdContextEditFaqRoute
   '/dashboard/$siteId/pages/$pageId': typeof DashboardSiteIdPagesPageIdRoute
   '/dashboard/$siteId/chats/': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context/': typeof DashboardSiteIdContextIndexRoute
@@ -371,6 +391,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/context/add'
     | '/dashboard/$siteId/context/edit'
+    | '/dashboard/$siteId/context/edit-faq'
     | '/dashboard/$siteId/pages/$pageId'
     | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/context'
@@ -389,6 +410,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId'
     | '/dashboard/$siteId/context/add'
     | '/dashboard/$siteId/context/edit'
+    | '/dashboard/$siteId/context/edit-faq'
     | '/dashboard/$siteId/pages/$pageId'
     | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/context'
@@ -408,6 +430,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/context/add'
     | '/dashboard/$siteId/context/edit'
+    | '/dashboard/$siteId/context/edit-faq'
     | '/dashboard/$siteId/pages/$pageId'
     | '/dashboard/$siteId/chats/'
     | '/dashboard/$siteId/context/'
@@ -472,6 +495,7 @@ export const routeTree = rootRoute
         "/dashboard/$siteId/",
         "/dashboard/$siteId/context/add",
         "/dashboard/$siteId/context/edit",
+        "/dashboard/$siteId/context/edit-faq",
         "/dashboard/$siteId/pages/$pageId",
         "/dashboard/$siteId/chats/",
         "/dashboard/$siteId/context/",
@@ -509,6 +533,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/$siteId/context/edit": {
       "filePath": "dashboard/$siteId/context/edit.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/context/edit-faq": {
+      "filePath": "dashboard/$siteId/context/edit-faq.tsx",
       "parent": "/dashboard/$siteId"
     },
     "/dashboard/$siteId/pages/$pageId": {

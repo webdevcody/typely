@@ -21,24 +21,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 const contextTypes = [
-  {
-    id: "file-upload",
-    title: "File Upload",
-    description: "Upload documents, PDFs, or text files to train your AI",
-    icon: Upload,
-    href: "add?type=file-upload",
-  },
   {
     id: "text",
     title: "Manual Text",
     description: "Manually enter text content to train your AI",
     icon: FileText,
     href: "add?type=text",
+  },
+  {
+    id: "file-upload",
+    title: "File Upload",
+    description: "Upload documents, PDFs, or text files to train your AI",
+    icon: Upload,
+    href: "add?type=file-upload",
   },
   {
     id: "faq",
@@ -56,6 +56,15 @@ export const Route = createFileRoute("/dashboard/$siteId/context/")({
 
 function RouteComponent() {
   const { siteId } = Route.useParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    // Try to get the saved tab from localStorage, default to "text"
+    return localStorage.getItem("contextActiveTab") || "text";
+  });
+
+  useEffect(() => {
+    // Save the active tab to localStorage whenever it changes
+    localStorage.setItem("contextActiveTab", activeTab);
+  }, [activeTab]);
 
   const { data: textContexts } = useQuery(
     convexQuery(api.context.getContextsBySiteIdAndType, {
@@ -78,6 +87,19 @@ function RouteComponent() {
     })
   );
 
+  function formatFAQContent(content: string) {
+    return content
+      .split(/\n\n/)
+      .map((pair) => {
+        const lines = pair.split("\n");
+        if (lines.length >= 2) {
+          return `${lines[0]}\n${lines[1]}`;
+        }
+        return pair;
+      })
+      .join("\n\n");
+  }
+
   const deleteContext = useMutation(api.context.deleteContext);
   const [contextToDelete, setContextToDelete] = useState<string | null>(null);
 
@@ -97,7 +119,11 @@ function RouteComponent() {
             <CardTitle>{context.title}</CardTitle>
             <div className="flex items-center gap-2">
               <Link
-                to="/dashboard/$siteId/context/edit"
+                to={
+                  context.type === "faq"
+                    ? "/dashboard/$siteId/context/edit-faq"
+                    : "/dashboard/$siteId/context/edit"
+                }
                 params={{ siteId }}
                 search={{ contextId: context._id }}
               >
@@ -147,8 +173,10 @@ function RouteComponent() {
               </Dialog>
             </div>
           </div>
-          <CardDescription className="mt-2 line-clamp-2">
-            {context.content}
+          <CardDescription className="mt-2 whitespace-pre-wrap">
+            {context.type === "faq"
+              ? formatFAQContent(context.content)
+              : context.content}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -160,7 +188,7 @@ function RouteComponent() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Add Context</h2>
         <p className="text-muted-foreground">
-          Choose how you want to add context to train your AI.
+          Add additional context to help your agents understand your business.
         </p>
       </div>
 
@@ -197,7 +225,11 @@ function RouteComponent() {
         <h2 className="text-2xl font-bold tracking-tight mb-6">
           Your Contexts
         </h2>
-        <Tabs defaultValue="text" className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="text">Text</TabsTrigger>
             <TabsTrigger value="file-upload">Files</TabsTrigger>
