@@ -32,6 +32,8 @@ import {
 import { useState, useEffect } from "react";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { DashboardCard } from "@/components/ui/dashboard-card";
+import { DashboardHeader } from "@/components/ui/dashboard-header";
 
 const contextTypes = [
   {
@@ -116,33 +118,30 @@ function RouteComponent() {
       return (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="relative mb-8">
-            <div className="h-24 w-24 text-primary/20 animate-pulse">
+            <div className="h-24 w-24 text-gray-500/20 animate-pulse">
               <FileX className="h-full w-full" />
             </div>
-            <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white">
+            <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
               <Plus className="h-5 w-5" />
             </div>
           </div>
 
-          <h3 className="font-semibold text-2xl mb-3 text-center">
+          <h3 className="font-semibold text-2xl mb-3 text-center text-white">
             Your Knowledge Base Awaits
           </h3>
 
           <div className="space-y-4 text-center max-w-md mb-8">
-            <p className="text-muted-foreground">
+            <p className="text-gray-400">
               Train your AI assistant by adding contexts - documents, FAQs, or
               any important information you want your AI to learn from.
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-500">
               Your AI becomes smarter with each context you add, providing more
               accurate and relevant responses.
             </p>
           </div>
 
-          <button
-            onClick={() => {}} // You'll need to wire this up to your add context handler
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-          >
+          <button className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
             <Plus className="h-5 w-5" />
             Add Your First Context
           </button>
@@ -151,10 +150,10 @@ function RouteComponent() {
     }
 
     return contexts.map((context) => (
-      <Card key={context._id} className="relative">
+      <DashboardCard key={context._id} variant="inner" className="relative">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{context.title}</CardTitle>
+            <CardTitle className="text-white">{context.title}</CardTitle>
             <div className="flex items-center gap-2">
               <Link
                 to={
@@ -165,7 +164,11 @@ function RouteComponent() {
                 params={{ siteId }}
                 search={{ contextId: context._id }}
               >
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-400 hover:text-white hover:bg-[#262932]"
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
               </Link>
@@ -177,15 +180,16 @@ function RouteComponent() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="text-gray-400 hover:text-white hover:bg-[#262932]"
                     onClick={() => setContextToDelete(context._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-[#1C1F26] border-[#262932] text-white">
                   <DialogHeader>
                     <DialogTitle>Delete Context</DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-gray-400">
                       Are you sure you want to delete this context? This action
                       cannot be undone.
                     </DialogDescription>
@@ -194,6 +198,7 @@ function RouteComponent() {
                     <Button
                       variant="ghost"
                       onClick={() => setContextToDelete(null)}
+                      className="border-[#262932] text-gray-300 hover:bg-[#262932] hover:text-white"
                     >
                       Cancel
                     </Button>
@@ -203,6 +208,7 @@ function RouteComponent() {
                         await deleteContext({ contextId: context._id });
                         setContextToDelete(null);
                       }}
+                      className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
                     >
                       Delete
                     </Button>
@@ -211,79 +217,103 @@ function RouteComponent() {
               </Dialog>
             </div>
           </div>
-          <CardDescription className="mt-2 whitespace-pre-wrap">
+          <CardDescription className="mt-2 whitespace-pre-wrap text-gray-400">
             {context.type === "faq"
               ? formatFAQContent(context.content)
               : context.content}
           </CardDescription>
         </CardHeader>
-      </Card>
+      </DashboardCard>
     ));
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Add Context</h2>
-        <p className="text-muted-foreground">
-          Add additional context to help your agents understand your business.
-        </p>
-      </div>
+    <div className="p-8 space-y-6 bg-[#0D0F12] min-h-full">
+      <DashboardHeader title="Dashboard/Context" />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 [&>*]:transition-transform [&>*]:duration-200 [&>*:hover]:scale-[1.02]">
-        {contextTypes.map((type) => {
-          const Icon = type.icon;
-          return (
-            <Link
-              key={type.id}
-              to="/dashboard/$siteId/context/add"
-              params={{ siteId }}
-              search={{ type: type.id }}
-              className="cursor-pointer h-full"
-            >
-              <Card className="hover:bg-muted/50 transition-colors h-full flex flex-col">
-                <CardHeader className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <CardTitle>{type.title}</CardTitle>
-                  </div>
-                  <CardDescription className="mt-2">
-                    {type.description}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
+      <DashboardCard>
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-white">
+              Add Context
+            </h2>
+            <p className="text-gray-400">
+              Add additional context to help your agents understand your
+              business.
+            </p>
+          </div>
 
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold tracking-tight mb-6">
-          Your Contexts
-        </h2>
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-4"
-        >
-          <TabsList>
-            <TabsTrigger value="text">Text</TabsTrigger>
-            <TabsTrigger value="file-upload">Files</TabsTrigger>
-            <TabsTrigger value="faq">FAQ</TabsTrigger>
-          </TabsList>
-          <TabsContent value="text" className="space-y-4">
-            {renderContextList(textContexts)}
-          </TabsContent>
-          <TabsContent value="file-upload" className="space-y-4">
-            {renderContextList(fileContexts)}
-          </TabsContent>
-          <TabsContent value="faq" className="space-y-4">
-            {renderContextList(faqContexts)}
-          </TabsContent>
-        </Tabs>
-      </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {contextTypes.map((type) => {
+              const Icon = type.icon;
+              return (
+                <Link
+                  key={type.id}
+                  to="/dashboard/$siteId/context/add"
+                  params={{ siteId }}
+                  search={{ type: type.id }}
+                  className="cursor-pointer h-full"
+                >
+                  <DashboardCard
+                    variant="inner"
+                    className="hover:bg-[#262932] transition-colors h-full flex flex-col group"
+                  >
+                    <CardHeader className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-blue-500/10">
+                          <Icon className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <CardTitle className="text-white group-hover:text-white">
+                          {type.title}
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="text-gray-400">
+                        {type.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </DashboardCard>
+                </Link>
+              );
+            })}
+          </div>
+
+          <Tabs
+            defaultValue={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-4"
+          >
+            <TabsList className="bg-[#1C1F26] border border-[#262932]">
+              <TabsTrigger
+                value="text"
+                className="data-[state=active]:bg-[#262932] data-[state=active]:text-white text-gray-400"
+              >
+                Text
+              </TabsTrigger>
+              <TabsTrigger
+                value="file"
+                className="data-[state=active]:bg-[#262932] data-[state=active]:text-white text-gray-400"
+              >
+                Files
+              </TabsTrigger>
+              <TabsTrigger
+                value="faq"
+                className="data-[state=active]:bg-[#262932] data-[state=active]:text-white text-gray-400"
+              >
+                FAQs
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="text" className="space-y-4">
+              {renderContextList(textContexts)}
+            </TabsContent>
+            <TabsContent value="file" className="space-y-4">
+              {renderContextList(fileContexts)}
+            </TabsContent>
+            <TabsContent value="faq" className="space-y-4">
+              {renderContextList(faqContexts)}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </DashboardCard>
     </div>
   );
 }
