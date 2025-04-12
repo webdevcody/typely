@@ -17,6 +17,8 @@ import { ConvexQueryClient } from "@convex-dev/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import { Logo } from "@/components/logo";
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
@@ -46,15 +48,23 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   const routerState = useRouterState();
+  const shouldHideHeaderFooter =
+    routerState.location.pathname.startsWith("/dashboard") ||
+    routerState.location.pathname.startsWith("/onboarding");
 
   return (
     <RootDocument>
       <div className="flex min-h-screen flex-col">
-        {!routerState.location.pathname.startsWith("/dashboard") && <Header />}
+        {!shouldHideHeaderFooter && <Header />}
+        {routerState.location.pathname.startsWith("/onboarding") && (
+          <div className="absolute top-4 left-4">
+            <Logo />
+          </div>
+        )}
         <main className="flex-1">
           <Outlet />
         </main>
-        {!routerState.location.pathname.startsWith("/dashboard") && <Footer />}
+        {!shouldHideHeaderFooter && <Footer />}
       </div>
     </RootDocument>
   );

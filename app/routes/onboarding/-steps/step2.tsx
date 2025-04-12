@@ -5,41 +5,52 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { DashboardHeader } from "@/components/ui/dashboard-header";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  name: z.string().min(1, "Site name is required"),
+  url: z
+    .string()
+    .min(1, "Sitemap URL is required")
+    .url("Please enter a valid URL")
+    .regex(/sitemap\.xml$/, "URL must end with sitemap.xml"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export function Step2() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    url: "",
-  });
   const createSite = useMutation(api.sites.createSite);
   const reindexSite = useMutation(api.sites.reindexSite);
 
-  useEffect(() => {
-    // Load from session storage if exists
-    const savedData = localStorage.getItem("siteFormData");
-    if (savedData) {
-      setFormData(JSON.parse(savedData));
-    }
-  }, []);
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      url: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Save form data to session storage
-      localStorage.setItem("siteFormData", JSON.stringify(formData));
-
-      const siteId = await createSite(formData);
-      // Save siteId to session storage for step3
+      const siteId = await createSite(data);
       localStorage.setItem("siteId", siteId);
-
       await reindexSite({ siteId });
-
       navigate({ to: "/onboarding/$step", params: { step: "3" } });
     } catch (error) {
       toast.error("There was an error creating your site. Please try again.");
@@ -62,71 +73,86 @@ export function Step2() {
               <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-cyan-500 to-white bg-clip-text text-transparent">
                 Enter Your Website Details
               </h2>
-              <form onSubmit={handleSubmit} className="space-y-6 text-left">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-gray-200">
-                    Site Name
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="My Awesome Website"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, name: e.target.value }))
-                    }
-                    required
-                    className="bg-dashboard-card-background border-[#262932] focus-visible:ring-1 focus-visible:ring-cyan-500/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="url" className="text-gray-200">
-                    Website Sitemap URL
-                  </Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    placeholder="https://example.com/sitemap.xml"
-                    value={formData.url}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, url: e.target.value }))
-                    }
-                    required
-                    className="bg-dashboard-card-background border-[#262932] focus-visible:ring-1 focus-visible:ring-cyan-500/50"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Enter the full URL of your sitemap.xml file.
-                  </p>
-                </div>
-                <div className="flex gap-3 justify-between pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() =>
-                      navigate({
-                        to: "/onboarding/$step",
-                        params: { step: "1" },
-                      })
-                    }
-                    className="border-[#262932] hover:bg-dashboard-card-background"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-gradient-to-r from-cyan-500/80 to-cyan-500 hover:from-cyan-500 hover:to-cyan-500/90 text-white shadow-lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Crawling Site...
-                      </>
-                    ) : (
-                      "Start Crawling Site"
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6 text-left"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-200">
+                          Site Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="My Awesome Website"
+                            className="bg-dashboard-card-background border-[#262932] focus-visible:ring-1 focus-visible:ring-cyan-500/50"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </Button>
-                </div>
-              </form>
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-200">
+                          Website Sitemap URL
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="url"
+                            placeholder="https://example.com/sitemap.xml"
+                            className="bg-dashboard-card-background border-[#262932] focus-visible:ring-1 focus-visible:ring-cyan-500/50"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-sm text-gray-400">
+                          Enter the full URL of your sitemap.xml file.
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex gap-3 justify-between pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        navigate({
+                          to: "/onboarding/$step",
+                          params: { step: "1" },
+                        })
+                      }
+                      className="border-[#262932] hover:bg-dashboard-card-background"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="bg-gradient-to-r from-cyan-500/80 to-cyan-500 hover:from-cyan-500 hover:to-cyan-500/90 text-white shadow-lg"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Crawling Site...
+                        </>
+                      ) : (
+                        "Start Crawling Site"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </div>
           </div>
         </div>

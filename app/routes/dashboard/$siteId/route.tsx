@@ -49,6 +49,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/Panel";
 
 const sidebarNavItems = [
   {
@@ -228,7 +229,7 @@ function RouteComponent() {
       {/* Main Content */}
       <main className="flex-1 ml-64">
         <div className="p-8 space-y-6 min-h-full">
-          <div className="rounded-2xl bg-dashboard-panel-background border border-[#262932]/50 shadow-sm">
+          <Panel>
             <div className="border-b-2 border-[#262932]">
               <div className="p-8">
                 <DashboardHeader title={getHeaderTitle()} />
@@ -237,7 +238,7 @@ function RouteComponent() {
             <div className="p-8">
               <Outlet />
             </div>
-          </div>
+          </Panel>
         </div>
       </main>
     </div>

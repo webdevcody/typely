@@ -6,6 +6,9 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Bot,
+  Copy,
+  Check,
 } from "lucide-react";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -18,6 +21,77 @@ import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardCard } from "@/components/ui/dashboard-card";
 import { InnerCard } from "@/components/InnerCard";
+import { Highlight, themes } from "prism-react-renderer";
+import { useState } from "react";
+import { WidgetInstallation } from "@/components/WidgetInstallation";
+
+function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative">
+      <Button
+        size="icon"
+        variant="ghost"
+        className="absolute right-2 top-2 h-8 w-8 hover:bg-[#262932]"
+        onClick={copyToClipboard}
+      >
+        {copied ? (
+          <Check className="h-4 w-4 text-green-500" />
+        ) : (
+          <Copy className="h-4 w-4 text-gray-400" />
+        )}
+      </Button>
+      <Highlight
+        theme={{
+          ...themes.nightOwl,
+          plain: { ...themes.nightOwl.plain, backgroundColor: "#262932" },
+        }}
+        code={code.trim()}
+        language="html"
+      >
+        {({ className, style, tokens, getLineProps, getTokenProps }) => (
+          <pre
+            className="text-sm p-4 rounded overflow-x-auto"
+            style={{ ...style, backgroundColor: "#262932" }}
+          >
+            {tokens.map((line, i) => (
+              <div
+                key={i}
+                {...getLineProps({ line })}
+                style={{ display: "table-row" }}
+              >
+                <span
+                  style={{
+                    display: "table-cell",
+                    paddingRight: "1em",
+                    userSelect: "none",
+                    opacity: 0.5,
+                    textAlign: "right",
+                    color: "#506882",
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span style={{ display: "table-cell" }}>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token })} />
+                  ))}
+                </span>
+              </div>
+            ))}
+          </pre>
+        )}
+      </Highlight>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/dashboard/$siteId/")({
   component: RouteComponent,
@@ -33,9 +107,14 @@ function RouteComponent() {
       siteId: siteId as Id<"sites">,
     })
   );
+  const { data: chatSessions } = useQuery(
+    convexQuery(api.chatMessages.listSessions, {
+      siteId: siteId as Id<"sites">,
+    })
+  );
   const reindexSite = useMutation(api.sites.reindexSite);
 
-  const isLoading = !site || !pages;
+  const isLoading = !site || !pages || !chatSessions;
 
   const totalPages = pages?.length;
   const successPages = pages?.filter(
@@ -93,6 +172,11 @@ function RouteComponent() {
             )}
           </div>
         </div>
+
+        {/* Widget Setup Instructions */}
+        {!isLoading && (!chatSessions || chatSessions.length === 0) && (
+          <WidgetInstallation siteId={siteId} className="mt-8 mb-8" />
+        )}
 
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-8">

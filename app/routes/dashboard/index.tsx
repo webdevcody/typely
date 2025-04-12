@@ -5,6 +5,10 @@ import { useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { DashboardCard } from "@/components/ui/dashboard-card";
 import { DashboardHeader } from "@/components/ui/dashboard-header";
+import { InnerCard } from "@/components/InnerCard";
+import { Logo } from "@/components/logo";
+import { Plus } from "lucide-react";
+import { Panel } from "@/components/ui/Panel";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -47,12 +51,14 @@ function RouteComponent() {
   }
 
   return (
-    <div className="p-8 space-y-6 bg-[#0D0F12] min-h-full">
-      <DashboardHeader title="Dashboard/Sites" />
+    <div className="p-8 space-y-12 min-h-full h-screen">
+      <div className="flex items-center gap-8">
+        <Logo />
+      </div>
 
-      <DashboardCard>
-        <div className="space-y-6">
-          <div>
+      <Panel>
+        <div className="border-b-2 border-[#262932]">
+          <div className="p-8">
             <h2 className="text-2xl font-bold tracking-tight text-white">
               Your Sites
             </h2>
@@ -60,12 +66,13 @@ function RouteComponent() {
               Select a site to manage or create a new one.
             </p>
           </div>
-
+        </div>
+        <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sites.map((site) => (
-              <DashboardCard
+              <InnerCard
                 key={site._id}
-                className="cursor-pointer hover:bg-[#262932] transition-colors"
+                className="cursor-pointer bg-[#1C1F26] hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-blue-400/10 hover:scale-[1.02] transition-all"
                 onClick={() =>
                   navigate({
                     to: "/dashboard/$siteId",
@@ -97,11 +104,23 @@ function RouteComponent() {
                     </span>
                   </div>
                 </div>
-              </DashboardCard>
+              </InnerCard>
             ))}
+
+            <InnerCard
+              className="cursor-pointer border-2 border-dashed border-gray-500/30 hover:border-cyan-500/50 hover:bg-[#262932]/50 transition-all flex items-center justify-center"
+              onClick={() => navigate({ to: "/onboarding" })}
+            >
+              <div className="text-center space-y-2">
+                <div className="size-10 rounded-full bg-[#262932] flex items-center justify-center mx-auto">
+                  <Plus className="w-5 h-5 text-cyan-500" />
+                </div>
+                <p className="text-gray-400 font-medium">Add a new site</p>
+              </div>
+            </InnerCard>
           </div>
         </div>
-      </DashboardCard>
+      </Panel>
     </div>
   );
 }
