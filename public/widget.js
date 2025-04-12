@@ -51,6 +51,7 @@
     }
 
     .chat-widget-container {
+      font-family: 'Inter', sans-serif;
       position: fixed;
       bottom: 100px;
       right: 20px;
