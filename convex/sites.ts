@@ -105,7 +105,7 @@ export const reindexSite = mutation({
       throw new Error("You are not authorized to reindex this site");
     }
 
-    await ctx.scheduler.runAfter(0, internal.crawler.crawlSiteWorkflow, {
+    await workflow.start(ctx, internal.crawler.crawlSiteWorkflow, {
       siteId: args.siteId,
       userId: site.site.userId,
     });

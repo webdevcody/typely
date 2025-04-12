@@ -65,7 +65,6 @@ function RouteComponent() {
             {sites.map((site) => (
               <DashboardCard
                 key={site._id}
-                variant="inner"
                 className="cursor-pointer hover:bg-[#262932] transition-colors"
                 onClick={() =>
                   navigate({

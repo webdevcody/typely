@@ -20,8 +20,10 @@ import { Route as OnboardingStepImport } from './routes/onboarding/$step'
 import { Route as DashboardSiteIdRouteImport } from './routes/dashboard/$siteId/route'
 import { Route as DashboardSiteIdIndexImport } from './routes/dashboard/$siteId/index'
 import { Route as DashboardSiteIdSettingsImport } from './routes/dashboard/$siteId/settings'
+import { Route as DashboardSiteIdInsightsImport } from './routes/dashboard/$siteId/insights'
 import { Route as DashboardSiteIdDocumentsImport } from './routes/dashboard/$siteId/documents'
 import { Route as DashboardSiteIdAgentsImport } from './routes/dashboard/$siteId/agents'
+import { Route as DashboardSiteIdAccountRouteImport } from './routes/dashboard/$siteId/account/route'
 import { Route as DashboardSiteIdPagesIndexImport } from './routes/dashboard/$siteId/pages/index'
 import { Route as DashboardSiteIdContextIndexImport } from './routes/dashboard/$siteId/context/index'
 import { Route as DashboardSiteIdChatsIndexImport } from './routes/dashboard/$siteId/chats/index'
@@ -86,6 +88,12 @@ const DashboardSiteIdSettingsRoute = DashboardSiteIdSettingsImport.update({
   getParentRoute: () => DashboardSiteIdRouteRoute,
 } as any)
 
+const DashboardSiteIdInsightsRoute = DashboardSiteIdInsightsImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => DashboardSiteIdRouteRoute,
+} as any)
+
 const DashboardSiteIdDocumentsRoute = DashboardSiteIdDocumentsImport.update({
   id: '/documents',
   path: '/documents',
@@ -97,6 +105,13 @@ const DashboardSiteIdAgentsRoute = DashboardSiteIdAgentsImport.update({
   path: '/agents',
   getParentRoute: () => DashboardSiteIdRouteRoute,
 } as any)
+
+const DashboardSiteIdAccountRouteRoute =
+  DashboardSiteIdAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => DashboardSiteIdRouteRoute,
+  } as any)
 
 const DashboardSiteIdPagesIndexRoute = DashboardSiteIdPagesIndexImport.update({
   id: '/pages/',
@@ -199,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingIndexImport
       parentRoute: typeof rootRoute
     }
+    '/dashboard/$siteId/account': {
+      id: '/dashboard/$siteId/account'
+      path: '/account'
+      fullPath: '/dashboard/$siteId/account'
+      preLoaderRoute: typeof DashboardSiteIdAccountRouteImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
     '/dashboard/$siteId/agents': {
       id: '/dashboard/$siteId/agents'
       path: '/agents'
@@ -211,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/dashboard/$siteId/documents'
       preLoaderRoute: typeof DashboardSiteIdDocumentsImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
+    '/dashboard/$siteId/insights': {
+      id: '/dashboard/$siteId/insights'
+      path: '/insights'
+      fullPath: '/dashboard/$siteId/insights'
+      preLoaderRoute: typeof DashboardSiteIdInsightsImport
       parentRoute: typeof DashboardSiteIdRouteImport
     }
     '/dashboard/$siteId/settings': {
@@ -282,8 +311,10 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface DashboardSiteIdRouteRouteChildren {
+  DashboardSiteIdAccountRouteRoute: typeof DashboardSiteIdAccountRouteRoute
   DashboardSiteIdAgentsRoute: typeof DashboardSiteIdAgentsRoute
   DashboardSiteIdDocumentsRoute: typeof DashboardSiteIdDocumentsRoute
+  DashboardSiteIdInsightsRoute: typeof DashboardSiteIdInsightsRoute
   DashboardSiteIdSettingsRoute: typeof DashboardSiteIdSettingsRoute
   DashboardSiteIdIndexRoute: typeof DashboardSiteIdIndexRoute
   DashboardSiteIdContextAddRoute: typeof DashboardSiteIdContextAddRoute
@@ -296,8 +327,10 @@ interface DashboardSiteIdRouteRouteChildren {
 }
 
 const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
+  DashboardSiteIdAccountRouteRoute: DashboardSiteIdAccountRouteRoute,
   DashboardSiteIdAgentsRoute: DashboardSiteIdAgentsRoute,
   DashboardSiteIdDocumentsRoute: DashboardSiteIdDocumentsRoute,
+  DashboardSiteIdInsightsRoute: DashboardSiteIdInsightsRoute,
   DashboardSiteIdSettingsRoute: DashboardSiteIdSettingsRoute,
   DashboardSiteIdIndexRoute: DashboardSiteIdIndexRoute,
   DashboardSiteIdContextAddRoute: DashboardSiteIdContextAddRoute,
@@ -320,8 +353,10 @@ export interface FileRoutesByFullPath {
   '/onboarding/$step': typeof OnboardingStepRoute
   '/dashboard': typeof DashboardIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/account': typeof DashboardSiteIdAccountRouteRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/insights': typeof DashboardSiteIdInsightsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
@@ -340,8 +375,10 @@ export interface FileRoutesByTo {
   '/onboarding/$step': typeof OnboardingStepRoute
   '/dashboard': typeof DashboardIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/account': typeof DashboardSiteIdAccountRouteRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/insights': typeof DashboardSiteIdInsightsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
@@ -362,8 +399,10 @@ export interface FileRoutesById {
   '/onboarding/$step': typeof OnboardingStepRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/dashboard/$siteId/account': typeof DashboardSiteIdAccountRouteRoute
   '/dashboard/$siteId/agents': typeof DashboardSiteIdAgentsRoute
   '/dashboard/$siteId/documents': typeof DashboardSiteIdDocumentsRoute
+  '/dashboard/$siteId/insights': typeof DashboardSiteIdInsightsRoute
   '/dashboard/$siteId/settings': typeof DashboardSiteIdSettingsRoute
   '/dashboard/$siteId/': typeof DashboardSiteIdIndexRoute
   '/dashboard/$siteId/context/add': typeof DashboardSiteIdContextAddRoute
@@ -385,8 +424,10 @@ export interface FileRouteTypes {
     | '/onboarding/$step'
     | '/dashboard'
     | '/onboarding'
+    | '/dashboard/$siteId/account'
     | '/dashboard/$siteId/agents'
     | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/insights'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/context/add'
@@ -404,8 +445,10 @@ export interface FileRouteTypes {
     | '/onboarding/$step'
     | '/dashboard'
     | '/onboarding'
+    | '/dashboard/$siteId/account'
     | '/dashboard/$siteId/agents'
     | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/insights'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId'
     | '/dashboard/$siteId/context/add'
@@ -424,8 +467,10 @@ export interface FileRouteTypes {
     | '/onboarding/$step'
     | '/dashboard/'
     | '/onboarding/'
+    | '/dashboard/$siteId/account'
     | '/dashboard/$siteId/agents'
     | '/dashboard/$siteId/documents'
+    | '/dashboard/$siteId/insights'
     | '/dashboard/$siteId/settings'
     | '/dashboard/$siteId/'
     | '/dashboard/$siteId/context/add'
@@ -489,8 +534,10 @@ export const routeTree = rootRoute
     "/dashboard/$siteId": {
       "filePath": "dashboard/$siteId/route.tsx",
       "children": [
+        "/dashboard/$siteId/account",
         "/dashboard/$siteId/agents",
         "/dashboard/$siteId/documents",
+        "/dashboard/$siteId/insights",
         "/dashboard/$siteId/settings",
         "/dashboard/$siteId/",
         "/dashboard/$siteId/context/add",
@@ -511,12 +558,20 @@ export const routeTree = rootRoute
     "/onboarding/": {
       "filePath": "onboarding/index.tsx"
     },
+    "/dashboard/$siteId/account": {
+      "filePath": "dashboard/$siteId/account/route.tsx",
+      "parent": "/dashboard/$siteId"
+    },
     "/dashboard/$siteId/agents": {
       "filePath": "dashboard/$siteId/agents.tsx",
       "parent": "/dashboard/$siteId"
     },
     "/dashboard/$siteId/documents": {
       "filePath": "dashboard/$siteId/documents.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/insights": {
+      "filePath": "dashboard/$siteId/insights.tsx",
       "parent": "/dashboard/$siteId"
     },
     "/dashboard/$siteId/settings": {

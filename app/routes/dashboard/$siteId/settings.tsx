@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DashboardCard } from "@/components/ui/dashboard-card";
+import { InnerCard } from "@/components/InnerCard";
 
 export const Route = createFileRoute("/dashboard/$siteId/settings")({
   component: RouteComponent,
@@ -44,8 +45,8 @@ function RouteComponent() {
 
       <div className="space-y-8">
         {/* Danger Zone */}
-        <div className="border border-red-500/20 rounded-xl p-6 bg-[#1C1F26]">
-          <h2 className="text-lg font-semibold text-red-500 mb-4">
+        <InnerCard className="border-destructive/50">
+          <h2 className="text-lg font-semibold text-destructive mb-4">
             Danger Zone
           </h2>
           <div className="flex items-center justify-between">
@@ -59,12 +60,11 @@ function RouteComponent() {
             <Button
               variant="destructive"
               onClick={() => setIsDeleteDialogOpen(true)}
-              className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
             >
               Delete site
             </Button>
           </div>
-        </div>
+        </InnerCard>
       </div>
 
       {/* Delete Site Dialog */}
