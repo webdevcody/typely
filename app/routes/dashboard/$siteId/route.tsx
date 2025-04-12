@@ -218,7 +218,12 @@ function RouteComponent() {
 
             <Link
               to="/dashboard/$siteId/support"
-              className="flex items-c enter gap-3 rounded-md px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] w-full"
+              params={{ siteId }}
+              activeProps={{
+                className:
+                  "bg-gradient-to-r from-primary-blue/30 via-[#1d2329] via-75% to-[#1d2329] text-white border border-[#262932] shadow-[inset_0_1px_1px_rgba(0,0,0,0.4),0_2px_4px_-1px_rgba(0,0,0,0.4),inset_0_-1px_1px_rgba(255,255,255,0.05)]",
+              }}
+              className="flex items-center gap-3 rounded-md px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] w-full"
             >
               <MessageSquare className="h-5 w-5" />
               <span>Support</span>

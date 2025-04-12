@@ -28,84 +28,140 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background-color: #007bff;
+      background: linear-gradient(to bottom right, #007bff, #0056b3);
       color: white;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .chat-widget-button svg {
+      width: 28px;
+      height: 28px;
+      stroke-width: 2;
+    }
+
+    .chat-widget-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
     }
 
     .chat-widget-container {
       position: fixed;
       bottom: 100px;
       right: 20px;
-      width: 300px;
-      height: 400px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 380px;
+      height: 600px;
+      background: #141518;
+      border: 1px solid #262932;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       display: none;
       flex-direction: column;
     }
 
     .chat-widget-header {
-      padding: 15px;
-      background: #007bff;
+      padding: 16px 20px;
+      background: #1C1F26;
       color: white;
-      border-radius: 10px 10px 0 0;
+      border-bottom: 1px solid #262932;
+      border-radius: 12px 12px 0 0;
+      font-weight: 600;
     }
 
     .chat-widget-messages {
       flex-grow: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
+      background: #141518;
+      scrollbar-width: thin;
+      scrollbar-color: #262932 #141518;
+    }
+
+    .chat-widget-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-widget-messages::-webkit-scrollbar-track {
+      background: #141518;
+    }
+
+    .chat-widget-messages::-webkit-scrollbar-thumb {
+      background-color: #262932;
+      border-radius: 3px;
     }
 
     .chat-message {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      max-width: 80%;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 85%;
       word-break: break-word;
-      overflow-wrap: break-word;
+      line-height: 1.5;
+      font-size: 14px;
     }
 
     .assistant-message {
-      background-color: #f0f0f0;
+      background-color: #1C1F26;
+      border: 1px solid #262932;
+      color: #e1e1e6;
       margin-right: auto;
     }
 
     .user-message {
-      background-color: #007bff;
+      background: linear-gradient(to bottom right, #007bff, #0056b3);
       color: white;
       margin-left: auto;
+      border: none;
     }
 
     .chat-widget-input-container {
-      padding: 15px;
-      border-top: 1px solid #eee;
+      padding: 16px;
+      border-top: 1px solid #262932;
+      background: #1C1F26;
+      border-radius: 0 0 12px 12px;
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .chat-widget-input {
       flex-grow: 1;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 12px;
+      background: #141518;
+      border: 1px solid #262932;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .chat-widget-input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 1px #007bff;
+    }
+
+    .chat-widget-input::placeholder {
+      color: #506882;
     }
 
     .chat-widget-submit {
-      padding: 8px 15px;
-      background: #007bff;
+      padding: 12px 20px;
+      background: linear-gradient(to bottom right, #007bff, #0056b3);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .chat-widget-submit:hover:not(:disabled) {
+      transform: translateY(-1px);
     }
 
     .chat-widget-submit:disabled {
@@ -124,16 +180,67 @@
       60% { content: '...'; }
       80%, 100% { content: ''; }
     }
+
+    .thinking-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background-color: #1C1F26;
+      border: 1px solid #262932;
+      color: #e1e1e6;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      max-width: 85%;
+      margin-right: auto;
+      font-size: 14px;
+    }
+
+    .thinking-dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      height: 20px;
+    }
+
+    .thinking-dots span {
+      width: 4px;
+      height: 4px;
+      background-color: #506882;
+      border-radius: 50%;
+      animation: thinking 1.4s infinite;
+      opacity: 0.5;
+    }
+
+    .thinking-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .thinking-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes thinking {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(-4px);
+        opacity: 1;
+      }
+    }
   `;
 
   const styleSheet = document.createElement("style");
   styleSheet.textContent = styles;
   document.head.appendChild(styleSheet);
 
-  // Create widget button
+  // Create widget button with SVG icon
   const button = document.createElement("button");
   button.className = "chat-widget-button";
-  button.innerHTML = "💬";
+  button.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
   document.body.appendChild(button);
 
   // Function to add a message to the chat
@@ -216,7 +323,7 @@
   async function fetchLatestMessages(chatSessionId) {
     debug("Fetching latest messages");
     try {
-      const response = await fetch(`${senseiProdUrl}/getChatSessions`, {
+      const response = await fetch(senseiProdUrl + "/getChatSessions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -235,23 +342,51 @@
       const { messages } = await response.json();
       debug("Received messages:", messages);
 
-      // Update lastMessageTimestamp if we received any messages
-      if (messages.length > 0) {
+      // Only process if we have new messages
+      if (messages && messages.length > 0) {
+        // Update lastMessageTimestamp
         lastMessageTimestamp = Math.max(
           ...messages.map((msg) => msg.createdAt)
         );
-      }
 
-      // Add all new messages to the chat
-      messages.forEach((message) => {
-        if (message.role === "assistant") {
-          addMessageToChat(message.content, true);
+        // Process new messages
+        const assistantMessages = messages.filter(
+          (msg) => msg.role === "assistant"
+        );
+
+        if (assistantMessages.length > 0) {
+          // Remove thinking indicator first
+          const thinkingIndicator = chatContainer.querySelector(
+            ".thinking-indicator"
+          );
+          if (thinkingIndicator) {
+            thinkingIndicator.remove();
+          }
+
+          // Then add all new assistant messages
+          assistantMessages.forEach((message) => {
+            addMessageToChat(message.content, true);
+          });
+
+          // Scroll to the latest message
+          const messagesContainer = chatContainer.querySelector(
+            ".chat-widget-messages"
+          );
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-      });
+      }
     } catch (error) {
       debug("Error fetching messages:", error);
       // Only show error if it's not a polling request
       if (!lastMessageTimestamp) {
+        // Remove thinking indicator if there's an error
+        const thinkingIndicator = chatContainer.querySelector(
+          ".thinking-indicator"
+        );
+        if (thinkingIndicator) {
+          thinkingIndicator.remove();
+        }
+
         addMessageToChat(
           "Sorry, there was an error getting the response. Please try again.",
           false,
@@ -318,7 +453,7 @@
     }
   });
 
-  // Update sendChatMessage to not fetch messages immediately
+  // Update sendChatMessage to only add thinking indicator
   async function sendChatMessage(content) {
     debug("Sending message:", content);
     const chatSessionId = localStorage.getItem("chatSessionId");
@@ -336,9 +471,22 @@
     try {
       // Add user message to UI immediately
       addMessageToChat(content, false);
+
+      // Add thinking indicator
+      const messagesContainer = chatContainer.querySelector(
+        ".chat-widget-messages"
+      );
+      const thinkingDiv = document.createElement("div");
+      thinkingDiv.className = "thinking-indicator";
+      thinkingDiv.innerHTML =
+        '<div class="thinking-dots"><span></span><span></span><span></span></div>';
+      thinkingDiv.insertAdjacentText("afterbegin", "Sensei is thinking ");
+      messagesContainer.appendChild(thinkingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
       debug("Sending to server...");
 
-      const response = await fetch(`${senseiProdUrl}/chatMessages`, {
+      const response = await fetch(senseiProdUrl + "/chatMessages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -355,12 +503,20 @@
         throw new Error("Failed to send message");
       }
 
-      const data = await response.json();
-      debug("Message sent successfully:", data);
+      await response.json();
+      debug("Message sent successfully");
 
-      // Remove fetchLatestMessages call since polling will handle it
+      // Note: We don't remove the thinking indicator here anymore
+      // It will be removed when the polling receives new messages
     } catch (error) {
       debug("Error sending message:", error);
+      // Remove thinking indicator if it exists
+      const thinkingIndicator = chatContainer.querySelector(
+        ".thinking-indicator"
+      );
+      if (thinkingIndicator) {
+        thinkingIndicator.remove();
+      }
       addMessageToChat(
         "Sorry, there was an error sending your message. Please try again.",
         false,

@@ -7,3 +7,8 @@
 - add a link inside the page view route which a user can click to navigate to the page in a new tab
 - add the ability for a site admin to upload a custom document for the site which will get indexed and included in the agent chat context for all questions
 - add in stripe with basic subscriptions
+
+## Chat Widget
+
+- we should probably find a way to style the returned info better, like maybe markdown?
+- refactor the widget to take in a ?siteId which will inject the siteId into the code that is returned from my backend. <script src="/widget.js?siteId=ABC"></script>
