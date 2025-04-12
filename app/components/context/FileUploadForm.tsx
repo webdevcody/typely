@@ -138,7 +138,16 @@ export function FileUploadForm() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() =>
+            navigate({ to: "/dashboard/$siteId/context", params: { siteId } })
+          }
+        >
+          Cancel
+        </Button>
         <Button type="submit" disabled={files.length === 0 || isUploading}>
           {isUploading ? (
             <>

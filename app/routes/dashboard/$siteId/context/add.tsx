@@ -5,6 +5,7 @@ import { FileUploadForm } from "@/components/context/FileUploadForm";
 import { TextInputForm } from "@/components/context/TextInputForm";
 import { FAQBuilderForm } from "@/components/context/FAQBuilderForm";
 import { Id } from "convex/_generated/dataModel";
+import { DashboardCard } from "@/components/ui/dashboard-card";
 
 export const Route = createFileRoute("/dashboard/$siteId/context/add")({
   component: RouteComponent,
@@ -46,11 +47,11 @@ function RouteComponent() {
   };
 
   return (
-    <div className="space-y-6">
+    <DashboardCard className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/dashboard/$siteId/context" params={{ siteId }}>
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="outline" size="icon">
+            <ArrowLeft className="size-4s" />
           </Button>
         </Link>
         <div>
@@ -63,7 +64,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card p-6">{getFormComponent()}</div>
-    </div>
+      {getFormComponent()}
+    </DashboardCard>
   );
 }

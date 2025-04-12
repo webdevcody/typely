@@ -40,6 +40,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-primary-blue: var(--primary-blue);
+  --color-card-background: var(--card-background);
+  --color-card-border: var(--card-border);
+  --color-dashboard-card-background: var(--dashboard-card-background);
+  --color-dashboard-card-border: var(--dashboard-card-border);
+  --color-dashboard-panel-background: var(--dashboard-panel-background);
 }
 
 :root {
@@ -75,10 +81,16 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
+  --primary-blue: oklch(0.62 0.21 259.24);
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
+  --background: #1d2329;
+  --card-background: #1d2329;
+  --card-border: #23292c;
+  --dashboard-panel-background: #15191c;
+  --dashboard-card-background: #1d2329;
+  --dashboard-card-border: #23292c;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
@@ -109,6 +121,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.488 0.243 264.376);
+  --primary-blue: oklch(0.62 0.21 259.24);
 }
 
 @layer base {

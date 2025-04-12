@@ -30,6 +30,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DashboardHeader } from "@/components/ui/dashboard-header";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Pencil, FileText, MessageSquare, Bot } from "lucide-react";
+import { InnerCard } from "@/components/InnerCard";
 
 const AI_AVATAR_URL =
   "https://api.dicebear.com/7.x/bottts/svg?seed=site-sensei&backgroundColor=633CFF";
@@ -59,226 +80,138 @@ function RouteComponent() {
   );
 
   return (
-    <div className="p-8 space-y-6 bg-[#0D0F12] min-h-full">
-      <DashboardHeader title="Dashboard/Chats" />
-
-      <DashboardCard>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Chats</h1>
-            <p className="text-gray-400">
-              View chat history for any users talking with Sensei
-            </p>
-          </div>
-
-          <div className="flex gap-4">
-            <Input
-              type="search"
-              placeholder="Search chats..."
-              className="w-64 bg-[#1C1F26] border-[#262932] text-gray-300 placeholder:text-gray-500"
-            />
-            <Select defaultValue="24h">
-              <SelectTrigger className="w-[180px] bg-[#1C1F26] border-[#262932] text-gray-300">
-                <SelectValue placeholder="Select time range" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#1C1F26] border-[#262932]">
-                <SelectItem
-                  value="24h"
-                  className="text-gray-300 focus:bg-[#262932] focus:text-white"
-                >
-                  Last 24 hours
-                </SelectItem>
-                <SelectItem
-                  value="7d"
-                  className="text-gray-300 focus:bg-[#262932] focus:text-white"
-                >
-                  Last 7 days
-                </SelectItem>
-                <SelectItem
-                  value="30d"
-                  className="text-gray-300 focus:bg-[#262932] focus:text-white"
-                >
-                  Last 30 days
-                </SelectItem>
-                <SelectItem
-                  value="all"
-                  className="text-gray-300 focus:bg-[#262932] focus:text-white"
-                >
-                  All time
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    <DashboardCard>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Recent Chats</h1>
+          <p className="text-gray-400">
+            View chat history for any users talking with Sensei
+          </p>
         </div>
+      </div>
 
-        <div className="rounded-xl border border-[#262932] overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-[#262932] hover:bg-transparent">
-                <TableHead className="w-48 text-gray-400">
-                  First Message
-                </TableHead>
-                <TableHead className="w-48 text-gray-400">
-                  Last Message
-                </TableHead>
-                <TableHead className="w-48 text-gray-400">Duration</TableHead>
-                <TableHead className="text-gray-400">First Message</TableHead>
-                <TableHead className="w-24 text-center text-gray-400">
-                  Messages
-                </TableHead>
-                <TableHead className="w-24 text-gray-400">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {!chatSessions ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="h-24 text-center text-gray-400"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
-                      Loading...
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : chatSessions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <span className="text-lg">No chat sessions yet</span>
-                      <span className="text-sm">
-                        Chat sessions will appear here once users start
-                        conversations
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                chatSessions.map((chat) => (
-                  <TableRow
-                    key={chat._id}
-                    className="cursor-pointer border-b border-[#262932] hover:bg-[#1C1F26] transition-colors"
-                    onClick={() => setSelectedSessionId(chat._id)}
-                  >
-                    <TableCell className="text-gray-300">
-                      {formatDistanceToNow(
-                        new Date(chat.firstMessage?.createdAt || 0),
-                        {
-                          addSuffix: true,
-                        }
-                      )}
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {formatDistanceToNow(
-                        new Date(chat.lastMessage?.createdAt || 0),
-                        {
-                          addSuffix: true,
-                        }
-                      )}
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {formatDistance(
-                        new Date(chat.firstMessage?.createdAt || 0),
-                        new Date(chat.lastMessage?.createdAt || 0),
-                        { includeSeconds: true }
-                      )}
-                    </TableCell>
-                    <TableCell className="truncate max-w-md text-gray-300">
-                      {chat.firstMessage?.content}
-                    </TableCell>
-                    <TableCell className="text-center font-medium text-gray-300">
-                      {messages?.length || 0}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                        ${
-                          Date.now() -
-                            new Date(
-                              chat.lastMessage?.createdAt || 0
-                            ).getTime() <
-                          5 * 60 * 1000
-                            ? "bg-green-500/10 text-green-500"
-                            : "bg-gray-500/10 text-gray-400"
-                        }`}
-                      >
-                        {Date.now() -
-                          new Date(chat.lastMessage?.createdAt || 0).getTime() <
-                        5 * 60 * 1000
-                          ? "Active"
-                          : "Ended"}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </DashboardCard>
-
-      <Sheet
-        open={!!selectedSessionId}
-        onOpenChange={() => setSelectedSessionId(null)}
-      >
-        <SheetContent className="w-[480px] sm:w-[540px] bg-[#1C1F26] border-l border-[#262932] p-0">
-          <SheetHeader className="p-6 border-b border-[#262932]">
-            <SheetTitle className="flex justify-between items-center text-white">
-              <span>Chat Session</span>
-              <span className="text-sm font-normal text-gray-400">
-                {messages?.length || 0} messages
-              </span>
-            </SheetTitle>
-          </SheetHeader>
-
-          <ScrollArea className="h-[calc(100vh-8rem)] px-6 py-4">
-            {!messages ? (
-              <div className="flex items-center justify-center h-32 text-gray-400 gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
-                Loading...
+      <div className="grid grid-cols-3 gap-6">
+        {/* Chat Sessions List */}
+        <div className="col-span-1 space-y-4">
+          {chatSessions?.map((session) => (
+            <InnerCard
+              key={session._id}
+              className={`p-4 rounded-xl cursor-pointer transition-colors ${
+                selectedSessionId === session._id &&
+                "bg-gradient-to-r from-primary-blue/40 via-[#1d2329] via-50%"
+              }`}
+              onClick={() => setSelectedSessionId(session._id)}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-white">
+                  {session.firstMessage?.content ? "User" : "Anonymous User"}
+                </h3>
+                <span className="text-xs text-gray-400">
+                  {new Date(session._creationTime).toLocaleDateString()}
+                </span>
               </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {messages.map((message) => (
-                  <div
+              <p className="text-sm text-gray-400 truncate">
+                {session.firstMessage?.content || "No messages"}
+              </p>
+            </InnerCard>
+          ))}
+
+          {(!chatSessions || chatSessions.length === 0) && (
+            <div className="text-center py-8 text-gray-400">
+              No chat sessions yet
+            </div>
+          )}
+        </div>
+
+        {/* Chat Messages */}
+        <div className="col-span-2">
+          {selectedSessionId ? (
+            <div className="space-y-4">
+              <ScrollArea className="h-[600px] pr-4">
+                {messages?.map((message) => (
+                  <InnerCard
                     key={message._id}
-                    className={`flex items-end gap-4 ${
-                      message.role === "assistant" ? "flex-row-reverse" : ""
+                    className={`p-4 rounded-xl mb-4 ${
+                      message.role === "assistant"
+                        ? "bg-[#1C1F26]"
+                        : "bg-[#262932]"
                     }`}
                   >
-                    <div
-                      className={`flex-1 rounded-xl p-3 text-sm ${
-                        message.role === "user"
-                          ? "bg-blue-500 text-white"
-                          : "bg-[#262932] text-gray-300"
-                      }`}
-                    >
-                      {message.content}
-                      <div className="text-xs opacity-70 mt-1">
-                        {formatDistanceToNow(new Date(message.createdAt), {
-                          addSuffix: true,
-                        })}
+                    <div className="flex items-center gap-3 mb-2">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          message.role === "assistant"
+                            ? "bg-primary-blue/20"
+                            : "bg-gray-600/20"
+                        }`}
+                      >
+                        {message.role === "assistant" ? (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-primary-blue"
+                          >
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M12 3v1.5M12 19.5V21M18.364 5.636l-1.06 1.06M6.696 17.304l-1.06 1.06M21 12h-1.5M4.5 12H3M18.364 18.364l-1.06-1.06M6.696 6.696l-1.06-1.06" />
+                          </svg>
+                        ) : (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-gray-400"
+                          >
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-white">
+                          {message.role === "assistant" ? "Sensei" : "User"}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(message._creationTime).toLocaleTimeString()}
+                        </span>
                       </div>
                     </div>
-                    <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-                      <img
-                        src={
-                          message.role === "user"
-                            ? USER_AVATAR_URL
-                            : AI_AVATAR_URL
-                        }
-                        alt={`${message.role === "user" ? "User" : "AI"} Avatar`}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  </div>
+                    <p className="text-gray-300 whitespace-pre-wrap pl-11">
+                      {message.content}
+                    </p>
+                  </InnerCard>
                 ))}
+              </ScrollArea>
+
+              {(!messages || messages.length === 0) && (
+                <div className="text-center py-8 text-gray-400">
+                  No messages in this chat session
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+              <div className="rounded-full bg-[#1C1F26] p-4 mb-4">
+                <MessageSquare className="h-8 w-8" />
               </div>
-            )}
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
-    </div>
+              <p className="text-lg font-medium">No chat selected</p>
+              <p className="text-sm mt-1">
+                Select a chat session from the left to view the conversation
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </DashboardCard>
   );
 }

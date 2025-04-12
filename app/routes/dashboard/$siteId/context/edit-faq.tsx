@@ -44,7 +44,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card p-6">
+      <div className="rounded-lg p-6">
         <FAQBuilderForm
           siteId={siteId as Id<"sites">}
           initialTitle={context.title}

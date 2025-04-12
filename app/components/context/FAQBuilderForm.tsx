@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash, X } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Id } from "../../../convex/_generated/dataModel";
+import { InnerCard } from "../InnerCard";
 
 interface FAQItem {
   question: string;
@@ -129,43 +130,61 @@ export function FAQBuilderForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
+        <label htmlFor="faq-title" className="text-sm font-medium">
+          FAQ Collection Title
+        </label>
         <Input
+          id="faq-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter a title for your FAQ collection"
           required
         />
+        <p className="text-sm text-muted-foreground">
+          Give your FAQ collection a descriptive title to help identify it later
+        </p>
       </div>
 
       {faqs.map((faq, index) => (
-        <div
+        <InnerCard
           key={index}
-          className="relative rounded-lg border bg-card p-4 space-y-4"
+          className="border p-8 rounded-xl last:border-b-0 space-y-4"
         >
-          <div className="absolute right-4 top-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 space-y-2">
+              <label
+                htmlFor={`question-${index}`}
+                className="text-sm font-medium"
+              >
+                Question {index + 1}
+              </label>
+              <Input
+                id={`question-${index}`}
+                value={faq.question}
+                onChange={(e) => updateFAQ(index, "question", e.target.value)}
+                placeholder="Enter your question"
+                required
+              />
+            </div>
             {faqs.length > 1 && (
               <Button
                 type="button"
-                variant="ghost"
+                variant="destructive"
                 size="icon"
                 onClick={() => removeFAQ(index)}
+                className="mt-6"
               >
-                <X className="h-4 w-4" />
+                <Trash className="size-4" />
               </Button>
             )}
           </div>
 
           <div className="space-y-2">
-            <Input
-              value={faq.question}
-              onChange={(e) => updateFAQ(index, "question", e.target.value)}
-              placeholder="Enter your question"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
+            <label htmlFor={`answer-${index}`} className="text-sm font-medium">
+              Answer {index + 1}
+            </label>
             <Textarea
+              id={`answer-${index}`}
               value={faq.answer}
               onChange={(e) => updateFAQ(index, "answer", e.target.value)}
               placeholder="Enter the answer"
@@ -173,24 +192,35 @@ export function FAQBuilderForm({
               required
             />
           </div>
-        </div>
+        </InnerCard>
       ))}
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between">
         <Button type="button" variant="outline" onClick={addFAQ}>
           <Plus className="h-4 w-4 mr-2" />
           Add Question
         </Button>
 
-        <Button
-          type="submit"
-          disabled={
-            !title.trim() ||
-            faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())
-          }
-        >
-          {contextId ? "Update FAQ" : "Save FAQ"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              navigate({ to: "/dashboard/$siteId/context", params: { siteId } })
+            }
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={
+              !title.trim() ||
+              faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())
+            }
+          >
+            {contextId ? "Update FAQ" : "Save FAQ"}
+          </Button>
+        </div>
       </div>
     </form>
   );

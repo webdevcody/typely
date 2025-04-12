@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/Skeleton";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { DashboardCard } from "@/components/ui/dashboard-card";
+import { InnerCard } from "@/components/InnerCard";
 
 export const Route = createFileRoute("/dashboard/$siteId/")({
   component: RouteComponent,
@@ -56,16 +58,9 @@ function RouteComponent() {
   };
 
   return (
-    <div className="p-8 space-y-6 bg-[#0D0F12] min-h-full">
-      {/* Header Section */}
-      <div className="flex items-center gap-2 text-gray-400 mb-6">
-        <span>Dashboard</span>
-        <span>/</span>
-        <span className="text-white">Overview</span>
-      </div>
-
+    <DashboardCard>
       {/* Site Info Panel */}
-      <div className="rounded-2xl bg-[#141518] p-8">
+      <div>
         <div className="space-y-2">
           {isLoading ? (
             <Skeleton type="title" />
@@ -101,7 +96,7 @@ function RouteComponent() {
 
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-8">
-          <div className="rounded-xl bg-[#1C1F26] p-6">
+          <InnerCard>
             <div className="flex items-center gap-4">
               <div className="rounded-full bg-blue-500/10 p-3">
                 <Files className="h-6 w-6 text-blue-500" />
@@ -113,9 +108,9 @@ function RouteComponent() {
                 </p>
               </div>
             </div>
-          </div>
+          </InnerCard>
 
-          <div className="rounded-xl bg-[#1C1F26] p-6">
+          <InnerCard>
             <div className="flex items-center gap-4">
               <div className="rounded-full bg-green-500/10 p-3">
                 <CheckCircle className="h-6 w-6 text-green-500" />
@@ -129,9 +124,9 @@ function RouteComponent() {
                 </p>
               </div>
             </div>
-          </div>
+          </InnerCard>
 
-          <div className="rounded-xl bg-[#1C1F26] p-6">
+          <InnerCard>
             <div className="flex items-center gap-4">
               <div className="rounded-full bg-yellow-500/10 p-3">
                 <Clock className="h-6 w-6 text-yellow-500" />
@@ -145,9 +140,9 @@ function RouteComponent() {
                 </p>
               </div>
             </div>
-          </div>
+          </InnerCard>
 
-          <div className="rounded-xl bg-[#1C1F26] p-6">
+          <InnerCard>
             <div className="flex items-center gap-4">
               <div className="rounded-full bg-red-500/10 p-3">
                 <XCircle className="h-6 w-6 text-red-500" />
@@ -161,13 +156,13 @@ function RouteComponent() {
                 </p>
               </div>
             </div>
-          </div>
+          </InnerCard>
         </div>
       </div>
 
       {/* Failed Pages Panel */}
       {failedPages !== undefined && failedPages > 0 && (
-        <div className="rounded-2xl bg-[#141518] p-8">
+        <div className="rounded-2xl bg-[#141518] p-8 mt-6">
           <h2 className="text-xl font-bold text-white mb-6">Failed Pages</h2>
           <div className="space-y-4">
             {pages
@@ -193,6 +188,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardCard>
   );
 }

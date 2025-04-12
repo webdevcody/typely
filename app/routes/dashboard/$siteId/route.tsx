@@ -6,6 +6,7 @@ import {
   redirect,
   Outlet,
   useRouter,
+  useRouterState,
 } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { Loader2 } from "lucide-react";
@@ -27,6 +28,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { SiteSelector } from "@/components/site-selector";
+import { DashboardHeader } from "@/components/ui/dashboard-header";
 
 const sidebarNavItems = [
   {
@@ -54,6 +56,11 @@ const sidebarNavItems = [
     href: "/dashboard/$siteId/chats",
     icon: MessageSquare,
   },
+  {
+    title: "Insights",
+    href: "/dashboard/$siteId/insights",
+    icon: BarChart4,
+  },
   // {
   //   title: "Agents",
   //   href: "/dashboard/$siteId/agents",
@@ -75,11 +82,22 @@ export const Route = createFileRoute("/dashboard/$siteId")({
 
 function RouteComponent() {
   const router = useRouter();
+  const routerState = useRouterState();
   const { data: sites, isLoading } = useQuery(
     convexQuery(api.sites.getUserSites, {})
   );
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const { siteId } = Route.useParams();
+
+  // Get the current route path and map it to a title
+  const currentPath = routerState.location.pathname;
+  const getHeaderTitle = () => {
+    const basePath = `/dashboard/${siteId}`;
+    if (currentPath === basePath) return "Dashboard/Overview";
+    const section = currentPath.replace(basePath, "").split("/")[1];
+    if (!section) return "Dashboard/Overview";
+    return `Dashboard/${section.charAt(0).toUpperCase() + section.slice(1)}`;
+  };
 
   useEffect(() => {
     if (isLoading || userLoading) return;
@@ -97,14 +115,16 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0D0F12]">
+    <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="fixed left-0 w-64 h-full bg-[#141518] border-r border-[#262932]">
+      <aside className="fixed left-0 w-64 h-full">
         <div className="flex flex-col h-full">
           {/* Logo and Site Selector */}
-          <div className="p-4 border-b border-[#262932]">
+          <div className="p-4">
             <div className="flex items-center gap-3 mb-3">
-              <img src="/icon.png" alt="Logo" className="w-8 h-8" />
+              <div className="flex items-center justify-center rounded-full border border-[#262932] bg-gradient-to-t from-primary-blue/80 via-[#1d2329] via-75% to-[#1d2329] p-2">
+                <img src="/icon.png" alt="Logo" className="size-12" />
+              </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="font-semibold text-white">Site Sensei</h2>
@@ -112,7 +132,7 @@ function RouteComponent() {
                     BETA
                   </span>
                 </div>
-                <p className="text-sm text-gray-400">All-In-One Site Manager</p>
+                <p className="text-sm text-gray-400">Chat with your Sites</p>
               </div>
             </div>
             <SiteSelector />
@@ -125,7 +145,7 @@ function RouteComponent() {
               <Input
                 type="search"
                 placeholder="Search anything..."
-                className="w-full bg-[#1C1F26] border-none pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#262932]"
+                className="w-full bg-[#141518] border-none pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#262932]"
               />
             </div>
           </div>
@@ -141,13 +161,14 @@ function RouteComponent() {
                       to={item.href}
                       params={{ siteId: siteId }}
                       activeProps={{
-                        className: "bg-[#1C1F26] text-white",
+                        className:
+                          "bg-gradient-to-r from-primary-blue/80 via-[#1d2329] via-75% to-[#1d2329] text-white border border-[#262932] shadow-[inset_0_1px_1px_rgba(0,0,0,0.4),0_2px_4px_-1px_rgba(0,0,0,0.4),inset_0_-1px_1px_rgba(255,255,255,0.05)]",
                       }}
                       activeOptions={{
                         exact: item.href === "/dashboard/$siteId",
                       }}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl px-4 py-3 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26]"
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] hover:ring-1 hover:ring-[#262932]"
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -171,7 +192,18 @@ function RouteComponent() {
 
       {/* Main Content */}
       <main className="flex-1 ml-64">
-        <Outlet />
+        <div className="p-8 space-y-6 min-h-full">
+          <div className="rounded-2xl bg-dashboard-panel-background border border-[#262932]/50 shadow-sm">
+            <div className="border-b-2 border-[#262932]">
+              <div className="p-8">
+                <DashboardHeader title={getHeaderTitle()} />
+              </div>
+            </div>
+            <div className="p-8">
+              <Outlet />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
