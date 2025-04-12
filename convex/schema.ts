@@ -17,6 +17,18 @@ const schema = defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  usage: defineTable({
+    siteId: v.id("sites"),
+    date: v.string(),
+    tokens: v.number(),
+    cost: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_siteId", ["siteId"])
+    .index("by_siteId_and_date", ["siteId", "date"]),
+
   contexts: defineTable({
     siteId: v.id("sites"),
     type: v.union(v.literal("text"), v.literal("file"), v.literal("faq")),

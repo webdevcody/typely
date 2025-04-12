@@ -18,11 +18,11 @@ import type * as converters from "../converters.js";
 import type * as crawler from "../crawler.js";
 import type * as http from "../http.js";
 import type * as index from "../index.js";
-import type * as openai from "../openai.js";
 import type * as pages from "../pages.js";
 import type * as siteMapper from "../siteMapper.js";
 import type * as sites from "../sites.js";
 import type * as support from "../support.js";
+import type * as usage from "../usage.js";
 import type * as users from "../users.js";
 
 import type {
@@ -50,11 +50,11 @@ declare const fullApi: ApiFromModules<{
   crawler: typeof crawler;
   http: typeof http;
   index: typeof index;
-  openai: typeof openai;
   pages: typeof pages;
   siteMapper: typeof siteMapper;
   sites: typeof sites;
   support: typeof support;
+  usage: typeof usage;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

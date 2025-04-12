@@ -29,6 +29,8 @@ export const generateContextEmbedding = internalAction({
 
     // Generate embedding for the content
     const embedding = await createEmbeddings(
+      ctx,
+      context.siteId,
       `${context.title}\n\n${context.content}`
     );
 

@@ -48,7 +48,11 @@ export const respondToChatSession = internalAction({
       }
 
       // Get embeddings for the user's question
-      const questionEmbedding = await createEmbeddings(lastUserMessage.content);
+      const questionEmbedding = await createEmbeddings(
+        ctx,
+        chatSession.siteId,
+        lastUserMessage.content
+      );
 
       const relevantPages = await ctx.runAction(
         internal.pages.getRelevantPages,
@@ -99,6 +103,16 @@ ${relevantContext}`,
         ],
       });
 
+      // Track chat completion usage
+      await ctx.runMutation(internal.usage.trackUsage, {
+        siteId: chatSession.siteId,
+        tokens: completion.usage?.total_tokens || 0,
+        cost: calculateGPT4oMiniCost(
+          completion.usage?.prompt_tokens || 0,
+          completion.usage?.completion_tokens || 0
+        ),
+      });
+
       const assistantResponse = completion.choices[0].message.content;
 
       if (!assistantResponse) {
@@ -122,10 +136,30 @@ ${relevantContext}`,
   },
 });
 
-export async function createEmbeddings(text: string) {
+function calculateGPT4oMiniCost(
+  inputTokens: number,
+  outputTokens: number
+): number {
+  const inputCost = (inputTokens / 1000) * 0.00015; // $0.150 per 1M tokens
+  const outputCost = (outputTokens / 1000) * 0.0006; // $0.600 per 1M tokens
+  return inputCost + outputCost;
+}
+
+export async function createEmbeddings(
+  ctx: any,
+  siteId: Id<"sites">,
+  text: string
+) {
   const response = await openai.embeddings.create({
     model: EMBEDDING_MODEL,
     input: text,
   });
+
+  await ctx.runMutation(internal.usage.trackUsage, {
+    siteId,
+    tokens: response.usage.total_tokens,
+    cost: (response.usage.total_tokens / 1000) * 0.00002,
+  });
+
   return response.data[0].embedding;
 }

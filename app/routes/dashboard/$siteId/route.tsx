@@ -82,6 +82,11 @@ const sidebarNavItems = [
     href: "/dashboard/$siteId/insights",
     icon: BarChart4,
   },
+  {
+    title: "Usage",
+    href: "/dashboard/$siteId/usage",
+    icon: Wallet,
+  },
   // {
   //   title: "Agents",
   //   href: "/dashboard/$siteId/agents",

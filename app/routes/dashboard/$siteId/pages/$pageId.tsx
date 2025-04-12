@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { convexQuery } from "@convex-dev/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
@@ -20,12 +20,21 @@ export const Route = createFileRoute("/dashboard/$siteId/pages/$pageId")({
 
 function RouteComponent() {
   const { pageId, siteId } = Route.useParams();
-  const reindexPage = useMutation(api.pages.reindexPage);
+  const queryClient = useQueryClient();
 
-  const { data: page, isLoading } = useQuery(
-    convexQuery(api.pages.getPageById, {
-      pageId: pageId as Id<"pages">,
-    })
+  const pageQuery = convexQuery(api.pages.getPageById, {
+    pageId: pageId as Id<"pages">,
+  });
+
+  const { data: page, isLoading } = useQuery(pageQuery);
+
+  const reindexPage = useMutation(api.pages.reindexPage).withOptimisticUpdate(
+    () => {
+      queryClient.setQueryData(pageQuery.queryKey, {
+        ...page,
+        crawlStatus: "crawling",
+      });
+    }
   );
 
   const isPageCrawling = page?.crawlStatus === "crawling";

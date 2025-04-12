@@ -2,8 +2,6 @@ import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { EMBEDDING_MODEL, openai, workflow } from ".";
-import { convertToMarkdown } from "./converters";
-import { createEmbeddings } from "./agent";
 
 export const crawlSiteWorkflow = workflow.define({
   args: { siteId: v.id("sites"), userId: v.id("users") },
@@ -34,6 +32,11 @@ export const crawlSiteWorkflow = workflow.define({
           })
         )
       );
+
+      await step.runMutation(internal.sites.updateSiteCrawlStatus, {
+        siteId: args.siteId,
+        crawlStatus: "completed",
+      });
     } catch (error) {
       await step.runMutation(internal.sites.updateSiteCrawlStatus, {
         siteId: args.siteId,
@@ -41,11 +44,6 @@ export const crawlSiteWorkflow = workflow.define({
       });
       throw error;
     }
-
-    await step.runMutation(internal.sites.updateSiteCrawlStatus, {
-      siteId: args.siteId,
-      crawlStatus: "completed",
-    });
 
     return sites;
   },
@@ -87,7 +85,20 @@ export const indexPage = internalAction({
         }
       );
 
-      const embeddings = await createEmbeddings(markdown);
+      // Create embeddings and track usage
+      const response = await openai.embeddings.create({
+        model: EMBEDDING_MODEL,
+        input: markdown,
+      });
+
+      // Track embedding usage
+      await ctx.runMutation(internal.usage.trackUsage, {
+        siteId: args.siteId,
+        tokens: response.usage.total_tokens,
+        cost: (response.usage.total_tokens / 1000) * 0.00002, // Ada embedding rate: $0.02 per 1M tokens
+      });
+
+      const embeddings = response.data[0].embedding;
 
       // Update page status
       await ctx.runMutation(internal.pages.updatePage, {

@@ -1,12 +1,12 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { api } from "../../../../../convex/_generated/api";
-import { Id } from "../../../../../convex/_generated/dataModel";
-import { Loader2, CheckCircle2, Globe, RefreshCw } from "lucide-react";
+import { Doc, Id } from "../../../../../convex/_generated/dataModel";
+import { Loader2, Globe, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { DashboardCard } from "@/components/ui/dashboard-card";
 import { InnerCard, innerCardStyles } from "@/components/InnerCard";
@@ -17,17 +17,34 @@ export const Route = createFileRoute("/dashboard/$siteId/pages/")({
 
 function RouteComponent() {
   const { siteId } = Route.useParams();
-  const reindexSite = useMutation(api.sites.reindexSite);
 
-  const { data: site } = useQuery(
-    convexQuery(api.sites.getSite, { siteId: siteId as Id<"sites"> })
-  );
+  const queryClient = useQueryClient();
+
+  const convexSiteQuery = convexQuery(api.sites.getSite, {
+    siteId: siteId as Id<"sites">,
+  });
+
+  const { data: site } = useQuery(convexSiteQuery);
 
   const { data: pages } = useQuery(
     convexQuery(api.pages.getPagesBySiteId, {
       siteId: siteId as Id<"sites">,
     })
   );
+
+  const reindexSite = useMutation(api.sites.reindexSite).withOptimisticUpdate(
+    () => {
+      queryClient.setQueryData(convexSiteQuery.queryKey, {
+        ...site,
+        crawlStatus: "crawling",
+      });
+    }
+  );
+
+  const isSiteCrawling =
+    site?.crawlStatus === "crawling" || site?.crawlStatus === "pending";
+
+  console.log({ isSiteCrawling, crawlStatus: site?.crawlStatus });
 
   const getPathFromUrl = (url: string) => {
     try {
@@ -63,8 +80,6 @@ function RouteComponent() {
       </div>
     );
   }
-
-  const isSiteCrawling = site.crawlStatus === "crawling";
 
   return (
     <DashboardCard>

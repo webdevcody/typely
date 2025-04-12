@@ -1,0 +1,30 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+Here is an example of doing optimistic updates in a react component with tanstack query and convex:
+
+```tsx
+
+// 1. bring in the tanstack query client
+const queryClient = useQueryClient();
+
+// 2. separate the convex query to a variable
+const convexSiteQuery = convexQuery(api.sites.getSite, {
+  siteId: siteId as Id<"sites">,
+});
+
+// 3. separate the query results
+const { data: site } = useQuery(convexSiteQuery);
+
+// 4. when doing a mutation, call withOptimisticUpdate and update the query client
+const reindexSite = useMutation(api.sites.reindexSite).withOptimisticUpdate(
+  () => {
+    queryClient.setQueryData(convexSiteQuery.queryKey, {
+      ...site,
+      crawlStatus: "crawling",
+    });
+  }
+);
+```
