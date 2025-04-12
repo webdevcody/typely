@@ -22,6 +22,7 @@ import type * as openai from "../openai.js";
 import type * as pages from "../pages.js";
 import type * as siteMapper from "../siteMapper.js";
 import type * as sites from "../sites.js";
+import type * as support from "../support.js";
 import type * as users from "../users.js";
 
 import type {
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   pages: typeof pages;
   siteMapper: typeof siteMapper;
   sites: typeof sites;
+  support: typeof support;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

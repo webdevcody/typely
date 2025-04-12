@@ -67,6 +67,16 @@ const schema = defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_chatSessionId", ["chatSessionId"]),
+  support: defineTable({
+    userId: v.string(),
+    siteId: v.string(),
+    message: v.string(),
+    status: v.optional(v.union(v.literal("open"), v.literal("closed"))),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_siteId", ["siteId"])
+    .index("by_status", ["status"]),
 });
 
 export default schema;

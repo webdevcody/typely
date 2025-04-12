@@ -24,6 +24,7 @@ import { Route as DashboardSiteIdInsightsImport } from './routes/dashboard/$site
 import { Route as DashboardSiteIdDocumentsImport } from './routes/dashboard/$siteId/documents'
 import { Route as DashboardSiteIdAgentsImport } from './routes/dashboard/$siteId/agents'
 import { Route as DashboardSiteIdAccountRouteImport } from './routes/dashboard/$siteId/account/route'
+import { Route as DashboardSiteIdSupportIndexImport } from './routes/dashboard/$siteId/support/index'
 import { Route as DashboardSiteIdPagesIndexImport } from './routes/dashboard/$siteId/pages/index'
 import { Route as DashboardSiteIdContextIndexImport } from './routes/dashboard/$siteId/context/index'
 import { Route as DashboardSiteIdChatsIndexImport } from './routes/dashboard/$siteId/chats/index'
@@ -110,6 +111,13 @@ const DashboardSiteIdAccountRouteRoute =
   DashboardSiteIdAccountRouteImport.update({
     id: '/account',
     path: '/account',
+    getParentRoute: () => DashboardSiteIdRouteRoute,
+  } as any)
+
+const DashboardSiteIdSupportIndexRoute =
+  DashboardSiteIdSupportIndexImport.update({
+    id: '/support/',
+    path: '/support/',
     getParentRoute: () => DashboardSiteIdRouteRoute,
   } as any)
 
@@ -305,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSiteIdPagesIndexImport
       parentRoute: typeof DashboardSiteIdRouteImport
     }
+    '/dashboard/$siteId/support/': {
+      id: '/dashboard/$siteId/support/'
+      path: '/support'
+      fullPath: '/dashboard/$siteId/support'
+      preLoaderRoute: typeof DashboardSiteIdSupportIndexImport
+      parentRoute: typeof DashboardSiteIdRouteImport
+    }
   }
 }
 
@@ -324,6 +339,7 @@ interface DashboardSiteIdRouteRouteChildren {
   DashboardSiteIdChatsIndexRoute: typeof DashboardSiteIdChatsIndexRoute
   DashboardSiteIdContextIndexRoute: typeof DashboardSiteIdContextIndexRoute
   DashboardSiteIdPagesIndexRoute: typeof DashboardSiteIdPagesIndexRoute
+  DashboardSiteIdSupportIndexRoute: typeof DashboardSiteIdSupportIndexRoute
 }
 
 const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
@@ -340,6 +356,7 @@ const DashboardSiteIdRouteRouteChildren: DashboardSiteIdRouteRouteChildren = {
   DashboardSiteIdChatsIndexRoute: DashboardSiteIdChatsIndexRoute,
   DashboardSiteIdContextIndexRoute: DashboardSiteIdContextIndexRoute,
   DashboardSiteIdPagesIndexRoute: DashboardSiteIdPagesIndexRoute,
+  DashboardSiteIdSupportIndexRoute: DashboardSiteIdSupportIndexRoute,
 }
 
 const DashboardSiteIdRouteRouteWithChildren =
@@ -366,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context': typeof DashboardSiteIdContextIndexRoute
   '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
+  '/dashboard/$siteId/support': typeof DashboardSiteIdSupportIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -388,6 +406,7 @@ export interface FileRoutesByTo {
   '/dashboard/$siteId/chats': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context': typeof DashboardSiteIdContextIndexRoute
   '/dashboard/$siteId/pages': typeof DashboardSiteIdPagesIndexRoute
+  '/dashboard/$siteId/support': typeof DashboardSiteIdSupportIndexRoute
 }
 
 export interface FileRoutesById {
@@ -412,6 +431,7 @@ export interface FileRoutesById {
   '/dashboard/$siteId/chats/': typeof DashboardSiteIdChatsIndexRoute
   '/dashboard/$siteId/context/': typeof DashboardSiteIdContextIndexRoute
   '/dashboard/$siteId/pages/': typeof DashboardSiteIdPagesIndexRoute
+  '/dashboard/$siteId/support/': typeof DashboardSiteIdSupportIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -437,6 +457,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/context'
     | '/dashboard/$siteId/pages'
+    | '/dashboard/$siteId/support'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -458,6 +479,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId/chats'
     | '/dashboard/$siteId/context'
     | '/dashboard/$siteId/pages'
+    | '/dashboard/$siteId/support'
   id:
     | '__root__'
     | '/'
@@ -480,6 +502,7 @@ export interface FileRouteTypes {
     | '/dashboard/$siteId/chats/'
     | '/dashboard/$siteId/context/'
     | '/dashboard/$siteId/pages/'
+    | '/dashboard/$siteId/support/'
   fileRoutesById: FileRoutesById
 }
 
@@ -546,7 +569,8 @@ export const routeTree = rootRoute
         "/dashboard/$siteId/pages/$pageId",
         "/dashboard/$siteId/chats/",
         "/dashboard/$siteId/context/",
-        "/dashboard/$siteId/pages/"
+        "/dashboard/$siteId/pages/",
+        "/dashboard/$siteId/support/"
       ]
     },
     "/onboarding/$step": {
@@ -608,6 +632,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/$siteId/pages/": {
       "filePath": "dashboard/$siteId/pages/index.tsx",
+      "parent": "/dashboard/$siteId"
+    },
+    "/dashboard/$siteId/support/": {
+      "filePath": "dashboard/$siteId/support/index.tsx",
       "parent": "/dashboard/$siteId"
     }
   }

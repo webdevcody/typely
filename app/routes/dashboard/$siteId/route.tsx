@@ -96,9 +96,7 @@ const sidebarNavItems = [
 
 export const Route = createFileRoute("/dashboard/$siteId")({
   component: RouteComponent,
-  beforeLoad: () => {
-    // We'll handle the redirect in the component since we need to wait for the query results
-  },
+  beforeLoad: () => {},
 });
 
 function RouteComponent() {
@@ -218,10 +216,13 @@ function RouteComponent() {
               </div>
             </Link>
 
-            <button className="flex items-center gap-3 rounded-md px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] w-full">
+            <Link
+              to="/dashboard/$siteId/support"
+              className="flex items-c enter gap-3 rounded-md px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-[#1C1F26] w-full"
+            >
               <MessageSquare className="h-5 w-5" />
               <span>Support</span>
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
