@@ -12,3 +12,7 @@
 
 - we should probably find a way to style the returned info better, like maybe markdown?
 - refactor the widget to take in a ?siteId which will inject the siteId into the code that is returned from my backend. <script src="/widget.js?siteId=ABC"></script>
+
+## Clean up
+
+- refactor any old auth approach in convex to use the `isSiteAdmin` aka `const userId = await getAuthUserId(ctx);`

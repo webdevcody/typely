@@ -54,17 +54,11 @@ export const getSite = query({
     siteId: v.id("sites"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return null;
-    }
-
-    const site = await ctx.db.get(args.siteId);
+    const site = await isSiteAdmin(ctx, args.siteId);
     if (!site) {
       return null;
     }
-
-    return site;
+    return site.site;
   },
 });
 
@@ -109,5 +103,69 @@ export const reindexSite = mutation({
       siteId: args.siteId,
       userId: site.site.userId,
     });
+  },
+});
+
+export const deleteSite = mutation({
+  args: {
+    siteId: v.id("sites"),
+  },
+  handler: async (ctx, args) => {
+    // Check if user has permission to delete this site
+    const site = await isSiteAdmin(ctx, args.siteId);
+    if (!site) {
+      throw new Error("You are not authorized to delete this site");
+    }
+
+    // 1. Delete all chat messages related to chat sessions of this site
+    const chatSessions = await ctx.db
+      .query("chatSessions")
+      .withIndex("by_siteId", (q) => q.eq("siteId", args.siteId))
+      .collect();
+
+    await Promise.all(
+      chatSessions.map(async (session) => {
+        // Delete all messages for this session
+        const messages = await ctx.db
+          .query("chatMessages")
+          .withIndex("by_chatSessionId", (q) =>
+            q.eq("chatSessionId", session._id)
+          )
+          .collect();
+
+        await Promise.all(
+          messages.map((message) => ctx.db.delete(message._id))
+        );
+
+        // Delete the session itself
+        await ctx.db.delete(session._id);
+      })
+    );
+
+    // 2. Delete all context entries and their associated storage files
+    const contexts = await ctx.db
+      .query("contexts")
+      .withIndex("by_siteId", (q) => q.eq("siteId", args.siteId))
+      .collect();
+
+    await Promise.all(
+      contexts.map(async (context) => {
+        if (context.storageId) {
+          await ctx.storage.delete(context.storageId);
+        }
+        await ctx.db.delete(context._id);
+      })
+    );
+
+    // 3. Delete all pages
+    const pages = await ctx.db
+      .query("pages")
+      .withIndex("by_siteId", (q) => q.eq("siteId", args.siteId))
+      .collect();
+
+    await Promise.all(pages.map((page) => ctx.db.delete(page._id)));
+
+    // 4. Finally, delete the site itself
+    await ctx.db.delete(args.siteId);
   },
 });

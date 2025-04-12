@@ -4,7 +4,7 @@ import {
   useParams,
 } from "@tanstack/react-router";
 import * as React from "react";
-import { useForm } from "@tanstack/react-form";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { XIcon } from "lucide-react";
@@ -18,26 +18,63 @@ import {
 } from "@/components/ui/dialog";
 import { DashboardCard } from "@/components/ui/dashboard-card";
 import { InnerCard } from "@/components/InnerCard";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 
 export const Route = createFileRoute("/dashboard/$siteId/settings")({
   component: RouteComponent,
 });
 
+type DeleteFormValues = {
+  confirmSiteName: string;
+};
+
 function RouteComponent() {
   const { siteId } = useParams({ from: "/dashboard/$siteId/settings" });
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const deleteSite = useMutation(api.sites.deleteSite);
+  const { data: site } = useQuery(
+    convexQuery(api.sites.getSite, {
+      siteId: siteId as Id<"sites">,
+    })
+  );
 
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<DeleteFormValues>({
     defaultValues: {
       confirmSiteName: "",
     },
-    onSubmit: async ({ value }) => {
-      // TODO: Implement delete site mutation
-      setIsDeleteDialogOpen(false);
-      navigate({ to: "/dashboard" });
-    },
   });
+
+  const confirmSiteName = watch("confirmSiteName");
+
+  const onSubmit = async (data: DeleteFormValues) => {
+    if (!site) return;
+
+    if (data.confirmSiteName !== site.name) {
+      toast.error("Site name does not match");
+      return;
+    }
+
+    try {
+      await deleteSite({ siteId: siteId as Id<"sites"> });
+      setIsDeleteDialogOpen(false);
+      toast.success("Site deleted successfully");
+      navigate({ to: "/dashboard" });
+    } catch (error) {
+      toast.error("Failed to delete site");
+      console.error("Error deleting site:", error);
+    }
+  };
 
   return (
     <DashboardCard>
@@ -78,31 +115,19 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}
-          >
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="py-4">
-              <div className="text-sm text-gray-500">
-                Please type <span className="font-semibold">confirm</span> to
-                confirm.
+              <div className="text-sm text-gray-300">
+                Please type{" "}
+                <span className="font-semibold text-white">{site?.name}</span>{" "}
+                to confirm.
               </div>
-              <form.Field
-                name="confirmSiteName"
-                children={(field) => (
-                  <input
-                    className={cn(
-                      "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
-                    )}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Type confirm to proceed"
-                  />
+              <input
+                {...register("confirmSiteName")}
+                className={cn(
+                  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
                 )}
+                placeholder="Type site name to proceed"
               />
             </div>
 
@@ -117,7 +142,7 @@ function RouteComponent() {
               <Button
                 type="submit"
                 variant="destructive"
-                disabled={form.state.values.confirmSiteName !== "confirm"}
+                disabled={!site || confirmSiteName !== site.name}
               >
                 Delete Site
               </Button>
