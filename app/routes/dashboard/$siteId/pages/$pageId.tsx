@@ -1,4 +1,4 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { Loader2, RefreshCw, Globe, Calendar, ArrowLeft } from "lucide-react";
@@ -8,11 +8,9 @@ import ReactMarkdown from "react-markdown";
 import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { useAction, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState, useEffect } from "react";
 import { InnerCard } from "@/components/InnerCard";
 import { DashboardCard } from "@/components/ui/dashboard-card";
 
@@ -51,45 +49,44 @@ function RouteComponent() {
 
   return (
     <DashboardCard>
-      <div className="space-y-6 overflow-x-hidden">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Link
             to="/dashboard/$siteId/pages"
             params={{ siteId }}
-            className="hover:text-accent-foreground"
+            className="text-gray-400 hover:text-white"
           >
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back to pages</span>
-            </Button>
+            <ArrowLeft className="h-6 w-6" />
           </Link>
-          <div className="flex flex-1 items-center justify-between">
-            <h1 className="text-3xl font-bold">
-              <a
-                href={page.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 text-xl font-medium hover:underline break-all"
-              >
-                <Globe className="size-6 text-muted-foreground flex-shrink-0" />
-                {page.url}
-              </a>
-            </h1>
-            <Button
-              onClick={handleReindex}
-              variant="outline"
-              size="sm"
-              disabled={isPageCrawling}
-            >
-              {isPageCrawling ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4 mr-2" />
-              )}
-              {isPageCrawling ? "Reindexing..." : "Reindex"}
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold text-white">Page Details</h1>
         </div>
+        <Button
+          onClick={handleReindex}
+          variant="outline"
+          disabled={isPageCrawling}
+          className="border-[#262932] text-gray-300 hover:bg-[#262932] hover:text-white"
+        >
+          {isPageCrawling ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4 mr-2" />
+          )}
+          {isPageCrawling ? "Reindexing..." : "Reindex Page"}
+        </Button>
+      </div>
+
+      <div className="space-y-6">
+        <InnerCard>
+          <a
+            href={page.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-300 hover:text-white hover:underline font-medium flex items-center gap-2"
+          >
+            <Globe className="h-5 w-5 text-gray-400" />
+            {page.url}
+          </a>
+        </InnerCard>
 
         <InnerCard className="gap-4">
           <div className="flex items-center justify-between text-muted-foreground text-sm">

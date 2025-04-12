@@ -36,20 +36,27 @@ const schema = defineSchema({
   pages: defineTable({
     url: v.string(),
     siteId: v.id("sites"),
-    html: v.string(),
-    markdown: v.string(),
     crawlStatus: v.union(
       v.literal("pending"),
       v.literal("crawling"),
       v.literal("completed"),
       v.literal("failed")
     ),
-    embeddings: v.array(v.float64()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_siteId_url", ["siteId", "url"])
-    .index("by_siteId", ["siteId"])
+    .index("by_siteId", ["siteId"]),
+  pagesContent: defineTable({
+    pageId: v.id("pages"),
+    siteId: v.id("sites"),
+    html: v.string(),
+    markdown: v.string(),
+    embeddings: v.array(v.float64()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_pageId", ["pageId"])
     .vectorIndex("embeddings", {
       vectorField: "embeddings",
       dimensions: 1536,

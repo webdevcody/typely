@@ -87,23 +87,46 @@ export const updatePage = internalMutation({
     embeddings: v.optional(v.array(v.number())),
   },
   handler: async (ctx, args) => {
-    const updateObject: Partial<Doc<"pages">> = {};
+    // Update page status
     if (args.crawlStatus) {
-      updateObject.crawlStatus = args.crawlStatus;
+      await ctx.db.patch(args.pageId, {
+        crawlStatus: args.crawlStatus,
+        updatedAt: Date.now(),
+      });
     }
-    if (args.html) {
-      updateObject.html = args.html;
+
+    // If we have content to update, handle it in pagesContent table
+    if (args.html || args.markdown || args.embeddings) {
+      const page = await ctx.db.get(args.pageId);
+      if (!page) throw new Error("Page not found");
+
+      // Get existing content or create new
+      const existingContent = await ctx.db
+        .query("pagesContent")
+        .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
+        .first();
+
+      const contentUpdate = {
+        ...(args.html && { html: args.html }),
+        ...(args.markdown && { markdown: args.markdown }),
+        ...(args.embeddings && { embeddings: args.embeddings }),
+        updatedAt: Date.now(),
+      };
+
+      if (existingContent) {
+        await ctx.db.patch(existingContent._id, contentUpdate);
+      } else {
+        await ctx.db.insert("pagesContent", {
+          pageId: args.pageId,
+          siteId: page.siteId,
+          html: args.html || "",
+          markdown: args.markdown || "",
+          embeddings: args.embeddings || [],
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        });
+      }
     }
-    if (args.markdown) {
-      updateObject.markdown = args.markdown;
-    }
-    if (args.embeddings) {
-      updateObject.embeddings = args.embeddings;
-    }
-    await ctx.db.patch(args.pageId, {
-      ...updateObject,
-      updatedAt: Date.now(),
-    });
   },
 });
 
@@ -118,9 +141,6 @@ export const createPage = internalMutation({
       siteId: args.siteId,
       crawlStatus: "pending",
       createdAt: Date.now(),
-      html: "",
-      markdown: "",
-      embeddings: [],
       updatedAt: Date.now(),
     });
     return pageId;
@@ -142,7 +162,19 @@ export const getPageById = query({
       return null;
     }
 
-    return page;
+    // Get the page content
+    const content = await ctx.db
+      .query("pagesContent")
+      .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
+      .first();
+
+    // Merge page with content
+    return {
+      ...page,
+      html: content?.html || "",
+      markdown: content?.markdown || "",
+      embeddings: content?.embeddings || [],
+    };
   },
 });
 
@@ -186,19 +218,60 @@ export const getRelevantPages = internalAction({
     siteId: v.id("sites"),
     query: v.array(v.float64()),
   },
-  handler: async (ctx, args) => {
-    const results = await ctx.vectorSearch("pages", "embeddings", {
+  handler: async (
+    ctx,
+    args
+  ): Promise<
+    Array<
+      Doc<"pages"> & { html: string; markdown: string; embeddings: number[] }
+    >
+  > => {
+    const results = await ctx.vectorSearch("pagesContent", "embeddings", {
       vector: args.query,
       limit: MAX_RELEVANT_PAGE_RESULTS,
       filter: (q) => q.eq("siteId", args.siteId),
     });
 
-    const pages: Doc<"pages">[] = await ctx.runQuery(
-      internal.pages._getPagesByIds,
-      { ids: results.map((result) => result._id) }
+    // Get the page content records
+    const pageContents: Array<Doc<"pagesContent">> = await ctx.runQuery(
+      internal.pages._getPageContentsByIds,
+      {
+        ids: results.map((result) => result._id),
+      }
     );
 
-    return pages;
+    // Get the associated pages
+    const pages: Array<Doc<"pages">> = await ctx.runQuery(
+      internal.pages._getPagesByIds,
+      {
+        ids: pageContents.map((content) => content.pageId),
+      }
+    );
+
+    // Merge pages with their content
+    return pages.map((page) => {
+      const content = pageContents.find((c) => c.pageId === page._id);
+      return {
+        ...page,
+        html: content?.html || "",
+        markdown: content?.markdown || "",
+        embeddings: content?.embeddings || [],
+      };
+    });
+  },
+});
+
+export const _getPageContentsByIds = internalQuery({
+  args: {
+    ids: v.array(v.id("pagesContent")),
+  },
+  handler: async (ctx, args) => {
+    const contents = await Promise.all(
+      args.ids.map(async (id) => {
+        return await ctx.db.get(id);
+      })
+    );
+    return contents.filter((content) => content !== null);
   },
 });
 
@@ -213,5 +286,42 @@ export const _getPagesByIds = internalQuery({
       })
     );
     return pages.filter((page) => page !== null);
+  },
+});
+
+export const updatePageContent = internalMutation({
+  args: {
+    pageId: v.id("pages"),
+    html: v.string(),
+    markdown: v.string(),
+    embeddings: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const page = await ctx.db.get(args.pageId);
+    if (!page) throw new Error("Page not found");
+
+    const existingContent = await ctx.db
+      .query("pagesContent")
+      .withIndex("by_pageId", (q) => q.eq("pageId", args.pageId))
+      .first();
+
+    if (existingContent) {
+      await ctx.db.patch(existingContent._id, {
+        html: args.html,
+        markdown: args.markdown,
+        embeddings: args.embeddings,
+        updatedAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert("pagesContent", {
+        pageId: args.pageId,
+        siteId: page.siteId,
+        html: args.html,
+        markdown: args.markdown,
+        embeddings: args.embeddings,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
   },
 });

@@ -89,13 +89,18 @@ export const indexPage = internalAction({
 
       const embeddings = await createEmbeddings(markdown);
 
-      // save embedding
+      // Update page status
       await ctx.runMutation(internal.pages.updatePage, {
         pageId: pageId,
-        embeddings: embeddings,
         crawlStatus: "completed",
+      });
+
+      // Store content in pagesContent table
+      await ctx.runMutation(internal.pages.updatePageContent, {
+        pageId: pageId,
         html: html,
         markdown: markdown,
+        embeddings: embeddings,
       });
     } catch (err) {
       console.error(err);
