@@ -1,0 +1,169 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+# Tanstack Router Rules and Best Practices
+
+## Route File Creation
+
+### Basic Route File Structure
+Route files in Tanstack Router follow a file-based routing pattern. Here's how to create a basic route file:
+
+```typescript
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/path")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  return <div>Your component content</div>;
+}
+```
+
+### Dynamic Route Parameters
+Routes with parameters use the `$` prefix in their file names. For example, `/dashboard/$siteId/pages.tsx`:
+
+```typescript
+export const Route = createFileRoute("/dashboard/$siteId/pages")({
+  component: RouteComponent,
+});
+```
+
+## Route Parameters
+
+### Accessing Route Parameters
+Use the `Route.useParams()` hook to access route parameters:
+
+```typescript
+function RouteComponent() {
+  const { siteId } = Route.useParams();
+  // Use siteId in your component
+}
+```
+
+## The $ Symbol in Routes
+
+The `$` symbol in route files indicates a dynamic parameter. For example:
+- `/dashboard/$siteId` matches URLs like `/dashboard/123`
+- `/users/$userId/posts/$postId` matches URLs like `/users/456/posts/789`
+
+Dynamic parameters are accessible via the `useParams` hook in your components.
+
+## Navigation
+
+### Using the Link Component
+The `Link` component provides declarative navigation:
+
+```typescript
+import { Link } from "@tanstack/react-router";
+
+function Navigation() {
+  return (
+    <Link 
+      to="/dashboard/$siteId" 
+      params={{ siteId: "123" }}
+      className="your-classes"
+    >
+      Dashboard
+    </Link>
+  );
+}
+```
+
+### Using useNavigate Hook
+For programmatic navigation, use the `useNavigate` hook:
+
+```typescript
+import { useNavigate } from "@tanstack/react-router";
+
+function NavigationButton() {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    navigate({ 
+      to: "/dashboard/$siteId",
+      params: { siteId: "123" }
+    });
+  };
+  
+  return <button onClick={handleClick}>Go to Dashboard</button>;
+}
+```
+
+## Using useQuery with convexQuery
+
+### Basic Query Setup
+```typescript
+import { convexQuery } from "@convex-dev/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "convex/_generated/api";
+
+function Component() {
+  const { data, isLoading } = useQuery(
+    convexQuery(api.sites.getUserSites, {})
+  );
+  
+  if (isLoading) return <LoadingSpinner />;
+  return <div>{/* render data */}</div>;
+}
+```
+
+### Query with Parameters
+```typescript
+function SiteComponent({ siteId }) {
+  const { data: site } = useQuery(
+    convexQuery(api.sites.getSite, {
+      siteId: siteId
+    })
+  );
+}
+```
+
+## Private Folders with "-" Prefix
+
+Folders prefixed with "-" (hyphen) are treated as private and don't affect routing. This is useful for:
+- Organizing component files
+- Storing utilities
+- Keeping helper functions
+
+Example structure:
+```
+/dashboard/$siteId/
+  ├── route.tsx
+  ├── -components/
+  │   ├── SiteSelector.tsx
+  │   └── Navigation.tsx
+  └── pages.tsx
+```
+
+The `-components` folder won't create any routes but keeps related components organized.
+
+## Layout Routes with route.tsx
+
+The `route.tsx` file can be used to create layouts that wrap child routes. Example:
+
+```typescript
+// app/routes/dashboard/$siteId/route.tsx
+export const Route = createFileRoute("/dashboard/$siteId")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  return (
+    <div className="layout">
+      <Sidebar />
+      <main>
+        <Outlet /> {/* Child routes render here */}
+      </main>
+    </div>
+  );
+}
+```
+
+Key points about layouts:
+- Use the `Outlet` component to render child routes
+- Apply common styling and structure
+- Share data and context with child routes
+- Handle layout-level authentication/authorization

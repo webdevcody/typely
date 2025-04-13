@@ -1,0 +1,437 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+# User Experience Guidelines
+
+## Form Implementation
+
+### Form Requirements
+- All forms must be implemented using `react-hook-form`
+- Client-side validation is mandatory
+- Loading states must be handled appropriately
+- Forms should provide clear feedback on errors
+
+### Example Implementation
+```tsx
+import { useForm } from "react-hook-form";
+import { LoaderButton } from "@/components/ui/loader-button";
+
+interface FormData {
+  name: string;
+  email: string;
+}
+
+export function ExampleForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
+
+  const onSubmit = async (data: FormData) => {
+    // Handle form submission
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("name", { required: "Name is required" })}
+        className="input"
+      />
+      {errors.name && <span>{errors.name.message}</span>}
+      
+      <input
+        {...register("email", { 
+          required: "Email is required",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Invalid email address"
+          }
+        })}
+        className="input"
+      />
+      {errors.email && <span>{errors.email.message}</span>}
+
+      <LoaderButton 
+        loading={isSubmitting}
+        loadingText="Saving..."
+        type="submit"
+      >
+        Save
+      </LoaderButton>
+    </form>
+  );
+}
+```
+
+## Button Loading States
+
+All buttons that trigger async operations must:
+- Disable during the operation
+- Show a loading spinner
+- Display loading text
+
+### Example Using LoaderButton
+```tsx
+import { LoaderButton } from "@/components/ui/loader-button";
+
+export function SubmitButton() {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      await someAsyncOperation();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <LoaderButton
+      loading={loading}
+      loadingText="Processing..."
+      onClick={handleClick}
+    >
+      Submit
+    </LoaderButton>
+  );
+}
+```
+
+## Delete Operations
+
+All delete operations must:
+- Show a confirmation dialog
+- Clearly state what will be deleted
+- Provide cancel and confirm options
+- Show loading state during deletion
+
+### Example Implementation
+```tsx
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { LoaderButton } from "@/components/ui/loader-button";
+
+export function DeleteButton() {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteOperation();
+    } finally {
+      setIsDeleting(false);
+      setShowConfirm(false);
+    }
+  };
+
+  return (
+    <>
+      <Button variant="destructive" onClick={() => setShowConfirm(true)}>
+        Delete
+      </Button>
+
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="ghost" onClick={() => setShowConfirm(false)}>
+              Cancel
+            </Button>
+            <LoaderButton
+              variant="destructive"
+              loading={isDeleting}
+              loadingText="Deleting..."
+              onClick={handleDelete}
+            >
+              Delete
+            </LoaderButton>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+```
+
+## Page Layout Components
+
+Use these components to maintain consistent design across the application:
+
+### Panel
+For general purpose containers:
+```tsx
+import { Panel } from "@/components/ui/Panel";
+
+<Panel className="p-6">
+  <h2>Panel Content</h2>
+  {/* Other content */}
+</Panel>
+```
+
+### DashboardCard
+For main content sections in dashboard views:
+```tsx
+import { DashboardCard } from "@/components/ui/dashboard-card";
+
+<DashboardCard className="space-y-4">
+  <h1>Dashboard Section</h1>
+  {/* Dashboard content */}
+</DashboardCard>
+```
+
+### InnerCard
+For nested content or interactive cards:
+```tsx
+import { InnerCard } from "@/components/InnerCard";
+
+<InnerCard className="hover:border-primary cursor-pointer">
+  <h3>Interactive Content</h3>
+  {/* Card content */}
+</InnerCard>
+```
+
+## Layout Hierarchy
+
+When structuring pages, follow this component hierarchy:
+1. DashboardCard for main sections
+2. Panel for sub-sections
+3. InnerCard for interactive elements or nested content
+
+Example page structure:
+```tsx
+<DashboardCard>
+  <h1>Main Dashboard</h1>
+  
+  <Panel className="mt-6">
+    <h2>Section Title</h2>
+    
+    <div className="grid grid-cols-2 gap-4 mt-4">
+      <InnerCard>
+        {/* Interactive content */}
+      </InnerCard>
+      
+      <InnerCard>
+        {/* Interactive content */}
+      </InnerCard>
+    </div>
+  </Panel>
+</DashboardCard>
+```
+
+# Loading States and Content Stability
+
+## Skeleton Loading Guidelines
+
+### Key Requirements
+- All pages using `useQuery` must implement skeleton loaders
+- Layout shift should be minimized during data loading
+- Maintain consistent spacing and dimensions between loading and loaded states
+- Use the same container components (Panel, DashboardCard, InnerCard) for skeletons
+
+### Example Implementation
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
+import { DashboardCard } from "@/components/ui/dashboard-card";
+import { Panel } from "@/components/ui/Panel";
+import { InnerCard } from "@/components/InnerCard";
+
+function DashboardPage() {
+  const { data: items, isLoading } = useQuery(
+    convexQuery(api.items.getItems, {})
+  );
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  return (
+    <DashboardCard>
+      <h1>Dashboard</h1>
+      <ItemsList items={items} />
+    </DashboardCard>
+  );
+}
+
+// Skeleton component with matching structure
+function DashboardSkeleton() {
+  return (
+    <DashboardCard>
+      {/* Match the exact height of the h1 to prevent layout shift */}
+      <div className="h-9 w-48 bg-gray-800 rounded animate-pulse" />
+      
+      <Panel className="mt-6">
+        {/* Match the grid layout of the actual content */}
+        <div className="grid grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <InnerCard key={i}>
+              <div className="space-y-3">
+                <div className="h-4 w-3/4 bg-gray-800 rounded animate-pulse" />
+                <div className="h-4 w-1/2 bg-gray-800 rounded animate-pulse" />
+              </div>
+            </InnerCard>
+          ))}
+        </div>
+      </Panel>
+    </DashboardCard>
+  );
+}
+```
+
+### Best Practices for Preventing Layout Shift
+
+1. **Reserve Space for Dynamic Content**
+```tsx
+function ItemCard({ item }) {
+  // Set minimum heights to prevent layout shift
+  return (
+    <InnerCard className="min-h-[200px]">
+      <div className="h-6">{item.title}</div>
+      <div className="min-h-[100px]">{item.description}</div>
+    </InnerCard>
+  );
+}
+```
+
+2. **Match Skeleton Dimensions**
+```tsx
+function TableSkeleton() {
+  return (
+    <Panel>
+      {/* Match the exact table header height */}
+      <div className="h-16 border-b border-gray-800">
+        <div className="h-4 w-24 bg-gray-800 rounded animate-pulse" />
+      </div>
+      
+      {/* Match the exact row heights */}
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-[52px] border-b border-gray-800 flex items-center">
+          <div className="h-4 w-48 bg-gray-800 rounded animate-pulse" />
+        </div>
+      ))}
+    </Panel>
+  );
+}
+```
+
+3. **Handle Loading States in Forms**
+```tsx
+function DataForm() {
+  const { data, isLoading } = useQuery(
+    convexQuery(api.form.getData, {})
+  );
+
+  return (
+    <Panel className="min-h-[400px]"> {/* Minimum height prevents layout shift */}
+      {isLoading ? (
+        <div className="space-y-4">
+          <div className="h-10 w-full bg-gray-800 rounded animate-pulse" />
+          <div className="h-10 w-full bg-gray-800 rounded animate-pulse" />
+          <div className="h-10 w-1/2 bg-gray-800 rounded animate-pulse" />
+        </div>
+      ) : (
+        <form>
+          {/* Form content */}
+        </form>
+      )}
+    </Panel>
+  );
+}
+```
+
+4. **Placeholder Images**
+```tsx
+function ImageCard({ imageUrl }) {
+  return (
+    <InnerCard>
+      <div className="aspect-video bg-gray-900"> {/* Maintain aspect ratio */}
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt="Content"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-800 animate-pulse" />
+        )}
+      </div>
+    </InnerCard>
+  );
+}
+```
+
+### Complex Data Loading Example
+```tsx
+function DashboardWithMultipleQueries() {
+  const { data: stats, isLoading: statsLoading } = useQuery(
+    convexQuery(api.stats.getStats, {})
+  );
+  
+  const { data: items, isLoading: itemsLoading } = useQuery(
+    convexQuery(api.items.getItems, {})
+  );
+
+  // Show skeleton until all data is loaded
+  if (statsLoading || itemsLoading) {
+    return (
+      <DashboardCard>
+        {/* Stats Section Skeleton */}
+        <Panel className="mb-6">
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 bg-gray-800 rounded animate-pulse" />
+            ))}
+          </div>
+        </Panel>
+
+        {/* Items Section Skeleton */}
+        <Panel>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-16 bg-gray-800 rounded animate-pulse" />
+            ))}
+          </div>
+        </Panel>
+      </DashboardCard>
+    );
+  }
+
+  return (
+    <DashboardCard>
+      {/* Actual content with identical structure */}
+    </DashboardCard>
+  );
+}
+```
+
+### Key Points to Remember
+- Always match the skeleton structure to the actual content structure
+- Use consistent component hierarchy (DashboardCard > Panel > InnerCard)
+- Set minimum heights and widths to prevent layout shift
+- Use aspect ratios for image placeholders
+- Animate skeletons with `animate-pulse` for better user experience
+- Load all required data before showing the actual content
+- Keep skeleton states simple but representative of the final layout
+
+This markdown document provides clear guidelines and examples for implementing forms, handling loading states, managing delete operations, and maintaining consistent layout design using your existing components. The examples are based on your actual component implementations and follow best practices for React applications.

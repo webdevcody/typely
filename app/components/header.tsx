@@ -6,13 +6,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Loader2, LogOut, Menu, Settings } from "lucide-react";
+import { Loader2, LogOut, Menu, NotepadText } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +25,6 @@ import { SiteSelector } from "./site-selector";
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Dashboard", href: "/dashboard" },
-  { name: "Change Log", href: "/changelog" },
 ];
 
 export function Header() {
@@ -50,8 +48,8 @@ export function Header() {
             to="/"
             className="font-bold text-xl flex items-center gap-2 text-foreground"
           >
-            <img className="size-12" src="/icon.png" />
-            SITE SENSEI
+            <NotepadText className="size-5" />
+            Typely
           </Link>
 
           {routerState.location.pathname.startsWith("/dashboard") && (
@@ -105,13 +103,6 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="w-full flex items-center">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <button
                     onClick={() => signOut()}
@@ -194,15 +185,6 @@ export function Header() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Link
-                          to="/settings"
-                          onClick={() => setIsSheetOpen(false)}
-                          className="block w-full"
-                        >
-                          <Button variant="outline" className="w-full">
-                            Settings
-                          </Button>
-                        </Link>
                         <Button
                           variant="outline"
                           className="w-full"
