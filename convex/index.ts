@@ -13,7 +13,5 @@ export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+export const CHAT_MODEL = "gpt-4o-mini";
 export const EMBEDDING_MODEL = "text-embedding-3-small";
-
-export const MAX_RELEVANT_CONTEXT_RESULTS = 3;
-export const MAX_RELEVANT_PAGE_RESULTS = 3;

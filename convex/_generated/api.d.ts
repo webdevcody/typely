@@ -8,21 +8,10 @@
  * @module
  */
 
-import type * as agent from "../agent.js";
+import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
-import type * as authorization from "../authorization.js";
-import type * as chatMessages from "../chatMessages.js";
-import type * as chatSessions from "../chatSessions.js";
-import type * as context from "../context.js";
-import type * as converters from "../converters.js";
-import type * as crawler from "../crawler.js";
 import type * as http from "../http.js";
 import type * as index from "../index.js";
-import type * as pages from "../pages.js";
-import type * as siteMapper from "../siteMapper.js";
-import type * as sites from "../sites.js";
-import type * as support from "../support.js";
-import type * as usage from "../usage.js";
 import type * as users from "../users.js";
 
 import type {
@@ -40,21 +29,10 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  agent: typeof agent;
+  ai: typeof ai;
   auth: typeof auth;
-  authorization: typeof authorization;
-  chatMessages: typeof chatMessages;
-  chatSessions: typeof chatSessions;
-  context: typeof context;
-  converters: typeof converters;
-  crawler: typeof crawler;
   http: typeof http;
   index: typeof index;
-  pages: typeof pages;
-  siteMapper: typeof siteMapper;
-  sites: typeof sites;
-  support: typeof support;
-  usage: typeof usage;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
