@@ -31,7 +31,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Site Sensei - AI Chat Agents for Your Website",
+        title: "Typely - A better way to write",
       },
     ],
     links: [
