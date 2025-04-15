@@ -1,4 +1,5 @@
 import { Button } from "./ui/button";
+import { Link } from "@tanstack/react-router";
 
 export function Hero() {
   return (
@@ -15,7 +16,9 @@ export function Hero() {
               what they're looking for.
             </p>
             <div className="mt-10 flex items-center gap-x-6">
-              <Button>Get Started Free</Button>
+              <Link to="/books/new">
+                <Button>Get Started Free</Button>
+              </Link>
             </div>
           </div>
           <div className="mt-16 sm:mt-20 lg:mt-0 lg:flex-shrink-0"></div>

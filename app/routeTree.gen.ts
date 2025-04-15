@@ -12,12 +12,40 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as BooksIndexImport } from './routes/books/index'
+import { Route as ChaptersChapterIdImport } from './routes/chapters/$chapterId'
+import { Route as BooksNewImport } from './routes/books/new'
+import { Route as BooksBookIdImport } from './routes/books/$bookId'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BooksIndexRoute = BooksIndexImport.update({
+  id: '/books/',
+  path: '/books/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChaptersChapterIdRoute = ChaptersChapterIdImport.update({
+  id: '/chapters/$chapterId',
+  path: '/chapters/$chapterId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BooksNewRoute = BooksNewImport.update({
+  id: '/books/new',
+  path: '/books/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BooksBookIdRoute = BooksBookIdImport.update({
+  id: '/books/$bookId',
+  path: '/books/$bookId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,6 +60,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/books/$bookId': {
+      id: '/books/$bookId'
+      path: '/books/$bookId'
+      fullPath: '/books/$bookId'
+      preLoaderRoute: typeof BooksBookIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/books/new': {
+      id: '/books/new'
+      path: '/books/new'
+      fullPath: '/books/new'
+      preLoaderRoute: typeof BooksNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/chapters/$chapterId': {
+      id: '/chapters/$chapterId'
+      path: '/chapters/$chapterId'
+      fullPath: '/chapters/$chapterId'
+      preLoaderRoute: typeof ChaptersChapterIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/books/': {
+      id: '/books/'
+      path: '/books'
+      fullPath: '/books'
+      preLoaderRoute: typeof BooksIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +95,63 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/books/$bookId': typeof BooksBookIdRoute
+  '/books/new': typeof BooksNewRoute
+  '/chapters/$chapterId': typeof ChaptersChapterIdRoute
+  '/books': typeof BooksIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/books/$bookId': typeof BooksBookIdRoute
+  '/books/new': typeof BooksNewRoute
+  '/chapters/$chapterId': typeof ChaptersChapterIdRoute
+  '/books': typeof BooksIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/books/$bookId': typeof BooksBookIdRoute
+  '/books/new': typeof BooksNewRoute
+  '/chapters/$chapterId': typeof ChaptersChapterIdRoute
+  '/books/': typeof BooksIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/books/$bookId'
+    | '/books/new'
+    | '/chapters/$chapterId'
+    | '/books'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/books/$bookId' | '/books/new' | '/chapters/$chapterId' | '/books'
+  id:
+    | '__root__'
+    | '/'
+    | '/books/$bookId'
+    | '/books/new'
+    | '/chapters/$chapterId'
+    | '/books/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BooksBookIdRoute: typeof BooksBookIdRoute
+  BooksNewRoute: typeof BooksNewRoute
+  ChaptersChapterIdRoute: typeof ChaptersChapterIdRoute
+  BooksIndexRoute: typeof BooksIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BooksBookIdRoute: BooksBookIdRoute,
+  BooksNewRoute: BooksNewRoute,
+  ChaptersChapterIdRoute: ChaptersChapterIdRoute,
+  BooksIndexRoute: BooksIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +164,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/books/$bookId",
+        "/books/new",
+        "/chapters/$chapterId",
+        "/books/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/books/$bookId": {
+      "filePath": "books/$bookId.tsx"
+    },
+    "/books/new": {
+      "filePath": "books/new.tsx"
+    },
+    "/chapters/$chapterId": {
+      "filePath": "chapters/$chapterId.tsx"
+    },
+    "/books/": {
+      "filePath": "books/index.tsx"
     }
   }
 }

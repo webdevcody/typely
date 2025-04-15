@@ -8,6 +8,10 @@ import {
 import { Outlet } from "@tanstack/react-router";
 import * as React from "react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { Button } from "../components/ui/button";
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 import appCss from "@/styles/app.css?url";
 import { ConvexReactClient } from "convex/react";
@@ -46,11 +50,66 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const navigate = useNavigate();
+  const identity = useQuery(api.users.getCurrentUser);
+
   return (
     <RootDocument>
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <Outlet />
+      <div className="min-h-screen bg-gray-50">
+        <nav className="bg-white shadow-sm">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-8">
+                <Button
+                  variant="ghost"
+                  className="text-xl font-bold"
+                  onClick={() => navigate({ to: "/" })}
+                >
+                  BookPlatform
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate({ to: "/books" })}
+                >
+                  Browse Books
+                </Button>
+                {identity && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate({ to: "/books" })}
+                  >
+                    Write a Book
+                  </Button>
+                )}
+              </div>
+              <div>
+                {identity ? (
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600">
+                      {identity.name || "User"}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        // Handle sign out through your existing auth system
+                        navigate({ to: "/" });
+                      }}
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={() => navigate({ to: "/" })}>Sign In</Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <main className="min-h-[calc(100vh-4rem)]">
+          <Outlet />
+        </main>
+
         <Footer />
       </div>
     </RootDocument>
